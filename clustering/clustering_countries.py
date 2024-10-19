@@ -17,7 +17,7 @@ from sklearn_extra.cluster import KMedoids
 url = './data/Country-data.csv'
 if not os.path.isfile(url):
   # Caso contrário vai buscar no github publico
-  url = '???'
+  url = 'https://raw.githubusercontent.com/edermartins/ia-lab/refs/heads/main/clustering/data/Country-data.csv'
 
 # Cria o dataset
 df = pd.read_csv(url)

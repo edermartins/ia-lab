@@ -1,3 +1,7 @@
+# Objetivo
+
+Entender a base do conceito de `clusterização` (Clusteting) ao analiar uma base de dados (Dataset) oriunda do Kaggle.
+
 # Machine Learning Clustering
 
 Este é um exercício acadêmico para entender e aplicar o uso de de Machine Learning não supervisionado para analisar e encontrar padrões. Neste caso utilizaremos Clustering para achar padrões entre países de um dataset.
