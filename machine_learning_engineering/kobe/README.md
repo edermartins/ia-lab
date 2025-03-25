@@ -4,7 +4,7 @@
 
 ## Projeto disponível no Github
 
-[https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/black-mamba-shot-selection](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/black-mamba-shot-selection)
+[https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe)
 
 
 # Descrição do Projeto
@@ -21,7 +21,7 @@ Para iniciar esta tarefa, baixe os dados que estão [localizados nesse link](htt
 1. A solução criada nesse projeto deve ser disponibilizada em repositório git e disponibilizada em servidor de repositórios (Github (recomendado), Bitbucket ou Gitlab). O projeto deve obedecer o Framework TDSP da Microsoft (estrutura de arquivos, arquivo requirements.txt e arquivo README - com as respostas pedidas nesse projeto, além de outras informações pertinentes). Todos os artefatos produzidos deverão conter informações referentes a esse projeto (não serão aceitos documentos vazios ou fora de contexto). Escreva o link para seu repositório. 
 > Em acordo com o professor Felipe Fink Grael, usaremos o padrão de pasta do Kedro
 >
-> Estrutura disponível no [github](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/black-mamba-shot-selection)
+> Estrutura disponível no [github](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe)
 
 
 2. Iremos desenvolver um preditor de arremessos usando duas abordagens (regressão logística e classificação) para prever se o "Black Mamba" (apelido de Kobe) acertou ou errou a cesta.
