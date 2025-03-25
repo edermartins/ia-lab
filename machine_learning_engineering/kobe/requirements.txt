@@ -1,0 +1,10 @@
+ipython>=8.10
+jupyterlab>=3.0
+kedro~=0.19.12
+kedro-datasets
+kedro-datasets[pandas]==1.6.0
+pandas>=2.0.0
+notebook
+pyarrow>=18.1.0
+mlflow>=2.21.0
+pycaret>=3.3.2
