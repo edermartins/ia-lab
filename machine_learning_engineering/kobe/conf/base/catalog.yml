@@ -33,3 +33,23 @@ logistic_regression_results:
 decision_tree_results:
   type: pickle.PickleDataSet
   filepath: data/06_models/decision_tree_results.pkl
+
+modelo_treinado:
+  type: pickle.PickleDataSet
+  filepath: data/06_models/modelo_final.pkl
+
+y_true_prod:
+  type: pandas.ParquetDataSet
+  filepath: data/01_raw/y_true_prod.parquet
+
+dados_producao_preparados:
+  type: pandas.ParquetDataSet
+  filepath: data/03_primary/dados_producao_preparados.parquet
+
+dados_com_previsoes:
+  type: pandas.ParquetDataSet
+  filepath: data/08_reporting/predictions_prod.parquet
+
+metricas_producao:
+  type: json.JSONDataSet
+  filepath: data/08_reporting/metricas_producao.json
