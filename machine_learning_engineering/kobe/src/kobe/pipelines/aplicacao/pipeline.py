@@ -1,5 +1,5 @@
 """
-This is a boilerplate pipeline 'pipeline_aplicacao'
+This is a boilerplate pipeline 'aplicacao'
 generated using Kedro 0.19.12
 """
 
@@ -12,8 +12,8 @@ def create_pipeline(**kwargs) -> Pipeline:
         [
             node(
                 func=carregar_dados_producao,
-                inputs="dataset_kobe_prod",
-                outputs="dados_producao_preparados",
+                inputs="data_filtered",
+                outputs=["dados_producao_preparados", "y_true_prod"],
                 name="carregar_dados_producao_node",
             ),
             node(

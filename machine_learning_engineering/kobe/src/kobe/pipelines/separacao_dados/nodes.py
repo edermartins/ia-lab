@@ -39,6 +39,7 @@ def split_data(df: pd.DataFrame) -> dict:
         test_df = pd.concat([X_test, y_test], axis=1)
         
         # Registrando parâmetros no MLflow
+        mlflow.set_experiment("kobe_bryant_shots")
         mlflow.log_param("test_size", test_size)
         mlflow.log_param("random_state", random_state)
         

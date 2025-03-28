@@ -1,5 +1,5 @@
 """
-This is a boilerplate test file for pipeline 'pipeline_aplicacao'
+This is a boilerplate test file for pipeline 'aplicacao'
 generated using Kedro 0.19.12.
 Please add your pipeline tests here.
 

@@ -36,7 +36,7 @@ decision_tree_results:
 
 modelo_treinado:
   type: pickle.PickleDataSet
-  filepath: data/06_models/modelo_final.pkl
+  filepath: data/06_models/logistic_regression_results.pkl
 
 y_true_prod:
   type: pandas.ParquetDataSet

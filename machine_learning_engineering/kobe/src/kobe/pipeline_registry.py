@@ -8,7 +8,7 @@ from kobe.pipelines.data_ingestion import create_pipeline as create_data_ingesti
 from kobe.pipelines.preparacao_dados import create_pipeline as create_preparacao_dados_pipeline
 from kobe.pipelines.separacao_dados import create_pipeline as create_separacao_dados_pipeline
 from kobe.pipelines.treinamento import create_pipeline as create_treinamento_pipeline
-from kobe.pipelines.pipeline_aplicacao import create_pipeline as create_pipeline_aplicacao
+from kobe.pipelines.aplicacao import create_pipeline as create_aplicacao_pipeline
 
 def register_pipelines() -> dict[str, Pipeline]:
     """Register the project's pipelines.
@@ -20,15 +20,15 @@ def register_pipelines() -> dict[str, Pipeline]:
     preparacao_dados_pipeline = create_preparacao_dados_pipeline()
     separacao_dados_pipeline = create_separacao_dados_pipeline()
     treinamento_pipeline = create_treinamento_pipeline()
-    pipeline_aplicacao = create_pipeline_aplicacao()
+    aplicacao_pipeline = create_aplicacao_pipeline()
 
     pipelines = {
-        "__default__": data_ingestion_pipeline,
         "data_ingestion": data_ingestion_pipeline,
         "preparacao_dados": preparacao_dados_pipeline,
         "separacao_dados": separacao_dados_pipeline,
         "treinamento": treinamento_pipeline,
-        "pipeline_aplicacao": pipeline_aplicacao
+        "aplicacao": aplicacao_pipeline,
+        "__default__": preparacao_dados_pipeline + separacao_dados_pipeline + treinamento_pipeline + aplicacao_pipeline,
     }
 
     return pipelines
