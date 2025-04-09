@@ -9,17 +9,21 @@ import numpy as np
 from sklearn.metrics import log_loss, f1_score
 from typing import Tuple, Dict
 
-def carregar_dados_producao(dados_producao: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def carregar_dados_producao(dados_producao: pd.DataFrame, features: list) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     Carrega e prepara os dados de produção
     
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: DataFrame com os dados de produção e DataFrame com o y_true
     """
-    # Extrai o y_true dos dados e converte para DataFrame
+    # Removendo registros com dados faltantes
+    dados_producao = dados_producao.dropna()
+
+    # Extrai o shot_made_flag dos dados e converte num DataFrame
     y_true = pd.DataFrame({'shot_made_flag': dados_producao['shot_made_flag'].values})
+
     
-    return dados_producao, y_true
+    return dados_producao[features], y_true
 
 def aplicar_modelo(
     dados_producao: pd.DataFrame,
@@ -53,17 +57,20 @@ def registrar_resultados_mlflow(
 ) -> Dict:
     """
     Registra os resultados no MLflow
+        dados_producao: parquet com os dados de produção que consta no enunciado
+        previsoes: Previsões do modelo treinado
+        y_true: shot_made_flag dos dados de produção
     """
     # Calcula as métricas
     log_loss_score = log_loss(y_true['shot_made_flag'], dados_producao['probability'])
-    f1 = f1_score(y_true['shot_made_flag'], previsoes)
+    f1_value = f1_score(y_true['shot_made_flag'], previsoes)
     
     # Registra a run no MLflow
     mlflow.set_experiment("kobe_bryant_shots")
     with mlflow.start_run(run_name="aplicacao"):
         # Registra as métricas
         mlflow.log_metric("log_loss", log_loss_score)
-        mlflow.log_metric("f1_score", f1)
+        mlflow.log_metric("f1_score", f1_value)
         
         # Salva os resultados como artefato
         mlflow.log_artifact(
@@ -73,5 +80,5 @@ def registrar_resultados_mlflow(
     
     return {
         "log_loss": log_loss_score,
-        "f1_score": f1
+        "f1_score": f1_value
     }

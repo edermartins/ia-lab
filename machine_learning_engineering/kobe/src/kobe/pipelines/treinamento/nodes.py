@@ -54,7 +54,7 @@ def train_logistic_regression(train_data: pd.DataFrame, test_data: pd.DataFrame)
     with mlflow.start_run(run_name="logistic_regression"):
         mlflow.log_metric("log_loss", log_loss_value)
         mlflow.log_metric("f1_score", f1_value)
-        mlflow.sklearn.log_model(lr_model, "model")
+        mlflow.sklearn.log_model(lr_model, "logistic_regression_model")
     
     return {"model": lr_model, "log_loss": log_loss_value, "f1_score": f1_value}
 
@@ -101,6 +101,6 @@ def train_decision_tree(train_data: pd.DataFrame, test_data: pd.DataFrame) -> di
     with mlflow.start_run(run_name="decision_tree"):
         mlflow.log_metric("log_loss", log_loss_value)
         mlflow.log_metric("f1_score", f1_value)
-        mlflow.sklearn.log_model(dt_model, "model")
+        mlflow.sklearn.log_model(dt_model, "decision_tree_model")
     
     return {"model": dt_model, "log_loss": log_loss_value, "f1_score": f1_value}

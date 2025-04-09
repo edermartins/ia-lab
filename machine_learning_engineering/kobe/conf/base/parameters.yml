@@ -1,0 +1,8 @@
+features:
+  - lat
+  - lon
+  - minutes_remaining
+  - period
+  - playoffs
+  - shot_distance
+  - shot_made_flag

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/zeta/ia-lab/machine_learning_engineering/kobe/notebooks/mlruns/337324300715366101/28f628e212284e13bf0e967e3be53b3a/artifacts
+end_time: 1743171902076
+entry_point_name: ''
+experiment_id: '337324300715366101'
+lifecycle_stage: active
+run_id: 28f628e212284e13bf0e967e3be53b3a
+run_name: Ada Boost Classifier
+run_uuid: 28f628e212284e13bf0e967e3be53b3a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1743171901079
+status: 3
+tags: []
+user_id: zeta

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/zeta/ia-lab/machine_learning_engineering/kobe/notebooks/mlruns/337324300715366101/94d707f0e25a46b4b35bf6d22d391254/artifacts
+end_time: 1743171902218
+entry_point_name: ''
+experiment_id: '337324300715366101'
+lifecycle_stage: active
+run_id: 94d707f0e25a46b4b35bf6d22d391254
+run_name: Gradient Boosting Classifier
+run_uuid: 94d707f0e25a46b4b35bf6d22d391254
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1743171902186
+status: 3
+tags: []
+user_id: zeta

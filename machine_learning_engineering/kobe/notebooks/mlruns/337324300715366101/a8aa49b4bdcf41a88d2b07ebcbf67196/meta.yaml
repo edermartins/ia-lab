@@ -1,0 +1,15 @@
+artifact_uri: file:///home/zeta/ia-lab/machine_learning_engineering/kobe/notebooks/mlruns/337324300715366101/a8aa49b4bdcf41a88d2b07ebcbf67196/artifacts
+end_time: 1743171902915
+entry_point_name: ''
+experiment_id: '337324300715366101'
+lifecycle_stage: active
+run_id: a8aa49b4bdcf41a88d2b07ebcbf67196
+run_name: Quadratic Discriminant Analysis
+run_uuid: a8aa49b4bdcf41a88d2b07ebcbf67196
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1743171902886
+status: 3
+tags: []
+user_id: zeta

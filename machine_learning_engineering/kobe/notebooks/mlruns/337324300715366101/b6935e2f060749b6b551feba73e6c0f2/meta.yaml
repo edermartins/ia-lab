@@ -1,0 +1,15 @@
+artifact_uri: file:///home/zeta/ia-lab/machine_learning_engineering/kobe/notebooks/mlruns/337324300715366101/b6935e2f060749b6b551feba73e6c0f2/artifacts
+end_time: 1743171903337
+entry_point_name: ''
+experiment_id: '337324300715366101'
+lifecycle_stage: active
+run_id: b6935e2f060749b6b551feba73e6c0f2
+run_name: Extra Trees Classifier
+run_uuid: b6935e2f060749b6b551feba73e6c0f2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1743171903306
+status: 3
+tags: []
+user_id: zeta

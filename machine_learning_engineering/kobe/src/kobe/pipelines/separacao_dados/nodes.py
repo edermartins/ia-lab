@@ -19,6 +19,7 @@ def split_data(df: pd.DataFrame) -> dict:
     """
     
     # Iniciando uma nova run do MLflow
+    mlflow.set_experiment("kobe_bryant_shots")
     with mlflow.start_run(run_name="separacao_dados"):
         # Assumindo que a coluna 'shot_made_flag' é nossa variável alvo
         X = df.drop('shot_made_flag', axis=1)

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/zeta/ia-lab/machine_learning_engineering/kobe/notebooks/mlruns/337324300715366101/c2b31048220a4c9a8915fa6ee9b07e2c/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '337324300715366101'
+lifecycle_stage: active
+run_id: c2b31048220a4c9a8915fa6ee9b07e2c
+run_name: Session Initialized 5047
+run_uuid: c2b31048220a4c9a8915fa6ee9b07e2c
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744145079376
+status: 1
+tags: []
+user_id: zeta

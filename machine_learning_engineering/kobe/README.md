@@ -32,6 +32,7 @@ Para iniciar esta tarefa, baixe os dados que estão [localizados nesse link](htt
     Para começar o desenvolvimento, desenhe um diagrama que demonstra todas as etapas necessárias para esse projeto, desde a aquisição de dados, passando pela criação dos modelos, indo até a operação do modelo.
 
 3. Como as ferramentas Streamlit, MLFlow, PyCaret e Scikit-Learn auxiliam na construção dos pipelines descritos anteriormente? A resposta deve abranger os seguintes aspectos:
+
     * a. Rastreamento de experimentos;
     * b. Funções de treinamento;
     * c. Monitoramento da saúde do modelo;
@@ -111,7 +112,7 @@ A base de dados contém informações sobre os arremessos realizados por Kobe Br
 
 1. Desenvolver um sistema de coleta de dados usando APIs públicas
 * O aluno categorizou corretamente os dados?
-> [Ver](#descrições-do-dataset)
+> [Clique aqui para ver](#descrições-do-dataset)
 * O aluno integrou a leitura dos dados corretamente à sua solução?
 * O aluno aplicou o modelo em produção (servindo como API ou como solução embarcada)?
 * O aluno indicou se o modelo é aderente a nova base de dados?

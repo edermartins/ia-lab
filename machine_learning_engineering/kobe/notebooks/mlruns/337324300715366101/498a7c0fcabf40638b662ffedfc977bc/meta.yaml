@@ -1,0 +1,15 @@
+artifact_uri: file:///home/zeta/ia-lab/machine_learning_engineering/kobe/notebooks/mlruns/337324300715366101/498a7c0fcabf40638b662ffedfc977bc/artifacts
+end_time: 1743171902634
+entry_point_name: ''
+experiment_id: '337324300715366101'
+lifecycle_stage: active
+run_id: 498a7c0fcabf40638b662ffedfc977bc
+run_name: Linear Discriminant Analysis
+run_uuid: 498a7c0fcabf40638b662ffedfc977bc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1743171902606
+status: 3
+tags: []
+user_id: zeta

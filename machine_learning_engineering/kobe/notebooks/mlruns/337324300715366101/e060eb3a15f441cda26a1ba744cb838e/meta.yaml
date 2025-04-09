@@ -1,0 +1,15 @@
+artifact_uri: file:///home/zeta/ia-lab/machine_learning_engineering/kobe/notebooks/mlruns/337324300715366101/e060eb3a15f441cda26a1ba744cb838e/artifacts
+end_time: 1744147542192
+entry_point_name: ''
+experiment_id: '337324300715366101'
+lifecycle_stage: active
+run_id: e060eb3a15f441cda26a1ba744cb838e
+run_name: Light Gradient Boosting Machine
+run_uuid: e060eb3a15f441cda26a1ba744cb838e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744147542158
+status: 3
+tags: []
+user_id: zeta
