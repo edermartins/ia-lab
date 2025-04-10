@@ -41,6 +41,26 @@ Para iniciar esta tarefa, baixe os dados que estão [localizados nesse link](htt
 
 4. Com base no diagrama realizado na questão 2, aponte os artefatos que serão criados ao longo de um projeto. Para cada artefato, a descrição detalhada de sua composição.
 
+### Descrição dos artefatos gerados
+
+> * data/01_raw/data.csv: Base de dados baixada do Kaggle, conforme pedido no exercício
+> * data/01_raw/dataset_kobe_dev.parquet: dados baixados do repositórios Githut, conforme pedido no exercício
+> * data/01_raw/dataset_kobe_prod.parquet: dados baixados do repositórios Githut, conforme pedido no exercício
+> * data/01_raw/y_true_prod.parquet: Dados reais de acertos (`shot_made_flag`) do arquivo `data/03_primary/dados_producao_preparados.parquet`, que é a base `data/01_raw/dataset_kobe_prod.parquet` sem os campos nulos
+> * data/02_intermediate/data_filtered.parquet: aruqivo `data/01_raw/data.csv` sem os dados nulos
+> * data/03_primary/base_test.parquet: 20% do aruqivo `data/02_intermediate/data_filtered.parquet` para teste
+> * data/03_primary/base_train.parquet: 80% do aruqivo `data/02_intermediate/data_filtered.parquet` para treino
+> * data/03_primary/dados_producao_preparados.parquet: É a base `data/01_raw/dataset_kobe_prod.parquet` sem os campos nulos
+> * data/06_models/decision_tree_results.pkl: Árvore de decisão treinada
+> * data/06_models/logistic_regression_results.pkl: Regressão logística treinada
+> * data/08_reporting/metricas_producao.json: Métricas do treinamento
+> * data/08_reporting/predictions_prod.parquet: Dados de previsão do modelo
+> Pipelines:
+> * src/kobe/pipelines/preparacao_dados: Pipeline + Node solititados no Item 5 de a. até b.
+> * src/kobe/pipelines/separacao_dados: Pipeline + Node solititados no Item 5.b.vii
+> * src/kobe/pipelines/treinamento: Pipeline + Node solititados no Item 6
+> * src/kobe/pipelines/aplicacao: Pipeline + Node solititados no Item 7
+
 5. Implemente o pipeline de processamento de dados com o mlflow, rodada (run) com o nome "PreparacaoDados":
 * a. Os dados devem estar localizados em "`/data/raw/dataset_kobe_dev.parquet`" e "`/data/raw/dataset_kobe_prod.parquet`" 
 * b. Observe que há dados faltantes na base de dados! As linhas que possuem dados faltantes devem ser desconsideradas. Para esse exercício serão apenas consideradas as colunas: 
@@ -54,7 +74,15 @@ Para iniciar esta tarefa, baixe os dados que estão [localizados nesse link](htt
       A variável `shot_made_flag` será seu alvo, onde 0 indica que Kobe errou e 1 que a cesta foi realizada. O dataset resultante será armazenado na pasta "`/data/processed/data_filtered.parquet`". Ainda sobre essa seleção, qual a dimensão resultante do dataset?
 
   * vii. Separe os dados em treino (80%) e teste (20 %) usando uma escolha aleatória e estratificada. Armazene os datasets resultantes em "/Data/processed/base_{train|test}.parquet . Explique como a escolha de treino e teste afetam o resultado do modelo final. Quais estratégias ajudam a minimizar os efeitos de viés de dados.
+> A escolha dos dados de treino e teste impacta diretamente a capacidade do modelo de aprender padrões reais e chegar numa boa generalização para dados novos. Um treino não pobre leva a overfifting ou underfitting. Já um teste inadequado fornece uma avaliação errada do desempenho. Viéses na divisão também podem distorcer a avaliação.
+
+> Para minimizar o viés podemos fazer uma **amostragem estratificada**, que garante proporções de classes/variáveis importantes semelhantes nos conjuntos. Usar uma **amostragem aleatória**, que ajuda a reduzir o viés de seleção, dando igual chance a cada amostra. **Validação cruzada**, que é capaz de avaliar o modelo em múltiplas divisões, oferecendo uma estimativa mais robusta.
+>
+> Além disso temos que considerar o **tamanho adequado** de ambos os conjuntos, para que representem a variabilidade dos dados e garatir que os dados de treino e teste tenham distribuições semelhantes.
+
+
   * viii. Registre os parâmetros (% teste) e métricas (tamanho de cada base) no MlFlow
+  > ![imagem](./docs/captura_5_viii.jpg)
 
 6. Implementar o pipeline de treinamento do modelo com o MlFlow usando o nome "Treinamento"
    * a. Com os dados separados para treinamento, treine um modelo com regressão logística do sklearn usando a biblioteca pyCaret.
@@ -69,6 +97,9 @@ Para iniciar esta tarefa, baixe os dados que estão [localizados nesse link](htt
    * c. Descreva as estratégias reativa e preditiva de retreinamento para o modelo em operação.
 
 8. Implemente um dashboard de monitoramento da operação usando Streamlit.
+
+# Desenho da solução
+![imagem](./docs/Kedro_Engenharia_de_Machine%20Learning_25E1_3.drawio.png)
 
 ____
 # Sessão com as respostas
@@ -116,6 +147,13 @@ A base de dados contém informações sobre os arremessos realizados por Kobe Br
 * O aluno integrou a leitura dos dados corretamente à sua solução?
 * O aluno aplicou o modelo em produção (servindo como API ou como solução embarcada)?
 * O aluno indicou se o modelo é aderente a nova base de dados?
+> No treinamento e nos teste obtivemos o `log_loss` = 0.6653528074905546
+>
+> Aplicando o modelo treinado à base de produção obtivemos o `log_loss` = 0.6273682111956478
+>
+> Esse resultado indica que o modelo foi muito bem com a base de produção, conseguiu um bom nível de generalização
+
+
 
 2. Criar uma solução de streaming de dados usando pipelines
 * O aluno criou um repositório git com a estrutura de projeto baseado no Framework TDSP da Microsoft?
@@ -132,7 +170,10 @@ A base de dados contém informações sobre os arremessos realizados por Kobe Br
 
 3. Preparar um modelo previamente treinado para uma solução de streaming de dados
 * O aluno indicou o objetivo e descreveu detalhadamente cada artefato criado no projeto?
+> [Clique aqui para ver o resumo](#descrição-dos-artefatos-gerados)
 * O aluno cobriu todos os artefatos do diagrama proposto?
+> Todos os artefatos foram cobertos e estão disponíveis no [Github](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe)
+
 * O aluno usou o MLFlow para registrar a rodada "Preparação de Dados" com as métricas e argumentos relevantes?
 > Pode ser visto no arquivo `nodes.py` do pipeline [Preparação do Dados](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe/src/kobe/pipelines/preparacao_dados)
 * O aluno removeu os dados faltantes da base?
@@ -140,16 +181,29 @@ A base de dados contém informações sobre os arremessos realizados por Kobe Br
 * O aluno selecionou as colunas indicadas para criar o modelo?
 > Pode ser visto no arquivo `nodes.py` do pipeline [Preparação do Dados](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe/src/kobe/pipelines/preparacao_dados)
 * O aluno indicou quais as dimensões para a base preprocessada?
+> Disponível nem `notebooks/dataset_analysis.ipynb`
+> A base `data/01_raw/data.csv` tem (30697, 25) antes de ser limpa e (25697, 25) após a remoção dos campos nulos.
+> 
+> Já a base de `data/01_raw/dataset_kobe_prod.parquet` tem (6426, 25), antes de ser limpo e (5412, 7) após a remoção dos campos nulos
+
 * O aluno criou arquivos para cada fase do processamento e os armazenou nas pastas indicadas?
 > Os arquivos de código e configuração podem ser vista no projeto do Github, mas os arquivos gerados não vão para o repositório mas se o projeto for executado os dados serão gerados. Mas segue uma imagem demostrando minha pasta:
+
 ![imagem](./docs/data_files_screeshot.png)
 * O aluno separou em duas bases, uma para treino e outra para teste?
+> Foram criadas duas bases: `data/03_primary/base_train.parquet` e `data/03_primary/base_test.parquet`
+
 * O aluno criou um pipeline chamado "Treinamento" no MlFlow?
+> O pipeline de treinamento gera duas linhas no MLFlow: logistic_regression e decision_tree
+![imagem](./docs/captura_pipeline_treinamento.jpg)
 
 4. Estabelecer um método de como atualizar o modelo empregado em produção
 * O aluno identificou a diferença entre a base de desenvolvimento e produção?
->
+> Neste exercício a base de desenvolvimento utilizada foi a `data/01_raw/data.csv` que é bem grande, com 25.697 linhas e a base de produção continha 5.412. Isso faz sentido porque o modelo precisa de muito dados para aprender e generalizar bem. E os dados de produção, muitas vezes são menores ou até são disponibilizados uma por vez, via API
+
 * O aluno descreveu como monitorar a saúde do modelo no cenário com e sem a disponibilidade da variável alvo?
+> Podemos monitorar um modelos de várias formas, inclusive vistas em matérias anteriores, através de métricas (acurácia, recall, f1 score, log loss, etc.). Também podemoa gerar uma curva AUC-ROC. Algumas dessas métricas e curvas podem ser vistas no notebook `notebooks/logistic_regression_and_decision_tree.ipynb`
+
 * O aluno implementou um dashboard de monitoramento da operação usando Streamlit?
 * O aluno descreveu as estratégias reativa e preditiva de retreinamento para o modelo em operação?
 
