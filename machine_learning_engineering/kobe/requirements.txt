@@ -1,11 +1,14 @@
 ipython==8.34.0
 jupyterlab>=3.0
-kedro~=0.19.12
-kedro-datasets
+kedro==0.19.12
+kedro-datasets==1.6.0
 kedro-datasets[pandas]==1.6.0
+kedro-telemetry==0.6.2
+kedro-viz==11.0.0
 pandas>=2.0.0
 notebook
 pyarrow==15.0.2
 mlflow==2.15.0
 pycaret>=3.3.2
+scikit-optimize
 streamlit

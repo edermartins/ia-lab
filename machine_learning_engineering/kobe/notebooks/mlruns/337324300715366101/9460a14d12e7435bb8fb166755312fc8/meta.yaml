@@ -1,0 +1,15 @@
+artifact_uri: file:///home/zeta/ia-lab/machine_learning_engineering/kobe/notebooks/mlruns/337324300715366101/9460a14d12e7435bb8fb166755312fc8/artifacts
+end_time: 1744330081449
+entry_point_name: ''
+experiment_id: '337324300715366101'
+lifecycle_stage: active
+run_id: 9460a14d12e7435bb8fb166755312fc8
+run_name: SVM - Linear Kernel
+run_uuid: 9460a14d12e7435bb8fb166755312fc8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744330081414
+status: 3
+tags: []
+user_id: zeta

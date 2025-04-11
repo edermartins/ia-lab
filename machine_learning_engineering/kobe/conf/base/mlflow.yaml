@@ -1,0 +1,7 @@
+server:
+  host: localhost
+  port: 5000
+  tracking_uri: http://localhost:5000
+  mlflow_tracking_uri: mlflow_runs
+
+

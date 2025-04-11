@@ -18,7 +18,7 @@ def preparar_dados(df: pd.DataFrame) -> pd.DataFrame:
         DataFrame processado com as featues e remove linhas com dados faltantes
     """
     # Iniciando uma nova run do MLflow
-    mlflow.set_experiment("kobe_bryant_shots")
+    mlflow.set_experiment("Preparacao de dados")
     with mlflow.start_run(run_name="preparacao_dados"):
         # Selecionando apenas as colunas necessárias
         colunas_selecionadas = ['lat', 'lon', 'minutes_remaining', 'period', 

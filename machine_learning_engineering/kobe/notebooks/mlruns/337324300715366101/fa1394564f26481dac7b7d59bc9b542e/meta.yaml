@@ -1,0 +1,15 @@
+artifact_uri: file:///home/zeta/ia-lab/machine_learning_engineering/kobe/notebooks/mlruns/337324300715366101/fa1394564f26481dac7b7d59bc9b542e/artifacts
+end_time: 1744330081028
+entry_point_name: ''
+experiment_id: '337324300715366101'
+lifecycle_stage: active
+run_id: fa1394564f26481dac7b7d59bc9b542e
+run_name: K Neighbors Classifier
+run_uuid: fa1394564f26481dac7b7d59bc9b542e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744330181726
+status: 3
+tags: []
+user_id: zeta

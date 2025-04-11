@@ -12,8 +12,8 @@ def create_pipeline(**kwargs) -> Pipeline:
         [
             node(
                 func=carregar_dados_producao,
-                #inputs="data_filtered",
                 inputs=["dataset_kobe_prod", "params:features"],
+                #inputs=["base_test", "params:features"],
                 outputs=["dados_producao_preparados", "y_true_prod"],
                 name="carregar_dados_producao_node",
             ),

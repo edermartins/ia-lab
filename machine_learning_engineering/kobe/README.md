@@ -93,13 +93,14 @@ Para iniciar esta tarefa, baixe os dados que estão [localizados nesse link](htt
 
 7. Registre o modelo de classificação e o sirva através do MLFlow (ou como uma API local, ou embarcando o modelo na aplicação). Desenvolva um pipeline de aplicação (`aplicacao.py`) para carregar a base de produção (`/data/raw/dataset_kobe_prod.parquet`) e aplicar o modelo. Nomeie a rodada (run) do mlflow como "PipelineAplicacao" e publique, tanto uma tabela com os resultados obtidos (artefato como `.parquet`), quanto log as métricas do novo log loss e f1_score do modelo.
    * a. O modelo é aderente a essa nova base? O que mudou entre uma base e outra? Justifique.
+   > O modelo não é aderente à nova base. Apensar de dos campos `minutes_remaining`, `period`, `playoffs` e `shot_distance` serem similares e até iguais à base data.csv, os campos `lat` e `lon` são diferentes, fazendo o modelo errar e predizer muito mal.
    * b. Descreva como podemos monitorar a saúde do modelo no cenário com e sem a disponibilidade da variável resposta para o modelo em operação.
    * c. Descreva as estratégias reativa e preditiva de retreinamento para o modelo em operação.
 
 8. Implemente um dashboard de monitoramento da operação usando Streamlit.
 
 # Desenho da solução
-![imagem](./docs/Kedro_Engenharia_de_Machine%20Learning_25E1_3.drawio.png)
+![imagem](./docs/diagrama.png)
 
 ____
 # Sessão com as respostas
@@ -107,7 +108,7 @@ Nesta sessão estão as soluções dos enunciados e as rúbricas solicitadas.
 
 ## Descrições do Dataset
 
-A base de dados contém informações sobre os arremessos realizados por Kobe Bryant (Black Mamba), jogador da NBA. Abaixo está a descrição dos campos disponíveis na base de dados (baseado em deduções e pesquisas no Kaggle, nem todos os campos são óbvios):
+A base de dados contém informações sobre os arremessos realizados por Kobe Bryant (Black Mamba), jogador da NBA. Abaixo está a descrição dos campos disponíveis na base de dados (baseado em deduções e pesquisas no Kaggle, nem todos os campos são óbvios). Cada linha é um arremesso:
 
 | Campo | Tipo | Descrição |
 |-------|------|-----------|
@@ -146,12 +147,12 @@ A base de dados contém informações sobre os arremessos realizados por Kobe Br
 > [Clique aqui para ver](#descrições-do-dataset)
 * O aluno integrou a leitura dos dados corretamente à sua solução?
 * O aluno aplicou o modelo em produção (servindo como API ou como solução embarcada)?
+> TODO
 * O aluno indicou se o modelo é aderente a nova base de dados?
-> No treinamento e nos teste obtivemos o `log_loss` = 0.6653528074905546
+> Após o treinamento com a base `data/01_raw/data.csv`, as predições utilizando a base `data/01_raw/dataset_kobe_prod.parquet` não foram boas. Obtive o `log_loss` = 0.6273682111956478 e `f1_score` = 0, o que indica que o modelo não conseguiu identificar nenhum elemento nessa base. 
 >
-> Aplicando o modelo treinado à base de produção obtivemos o `log_loss` = 0.6273682111956478
->
-> Esse resultado indica que o modelo foi muito bem com a base de produção, conseguiu um bom nível de generalização
+> Isso pode ser visto no arquivo `data/08_reporting/predictions_prod.parquet`, onde todos os campos `prediction` estão em zero. Também observei que as probabilidades são bem baixas. O que indica que o modelo não é aderente á base de produção.
+
 
 
 
@@ -184,10 +185,12 @@ A base de dados contém informações sobre os arremessos realizados por Kobe Br
 > Disponível nem `notebooks/dataset_analysis.ipynb`
 > A base `data/01_raw/data.csv` tem (30697, 25) antes de ser limpa e (25697, 25) após a remoção dos campos nulos.
 > 
-> Já a base de `data/01_raw/dataset_kobe_prod.parquet` tem (6426, 25), antes de ser limpo e (5412, 7) após a remoção dos campos nulos
+> Já a base de `data/01_raw/dataset_kobe_prod.parquet` tem (6426, 25), antes de ser limpo e (5412, 7) após a remoção dos campos nulos.
+> 
+> Isso pode ser visto no notebook [dataset_analysis.ipynb](notebooks/dataset_analysis.ipynb)
 
 * O aluno criou arquivos para cada fase do processamento e os armazenou nas pastas indicadas?
-> Os arquivos de código e configuração podem ser vista no projeto do Github, mas os arquivos gerados não vão para o repositório mas se o projeto for executado os dados serão gerados. Mas segue uma imagem demostrando minha pasta:
+> Os arquivos de código e configuração podem ser vista no projeto do Github, mas os arquivos gerados não vão para o repositório mas se o projeto for executado os dados serão gerados. Também estou adicionando uma imagem demostrando minha pasta:
 
 ![imagem](./docs/data_files_screeshot.png)
 * O aluno separou em duas bases, uma para treino e outra para teste?
@@ -199,12 +202,14 @@ A base de dados contém informações sobre os arremessos realizados por Kobe Br
 
 4. Estabelecer um método de como atualizar o modelo empregado em produção
 * O aluno identificou a diferença entre a base de desenvolvimento e produção?
-> Neste exercício a base de desenvolvimento utilizada foi a `data/01_raw/data.csv` que é bem grande, com 25.697 linhas e a base de produção continha 5.412. Isso faz sentido porque o modelo precisa de muito dados para aprender e generalizar bem. E os dados de produção, muitas vezes são menores ou até são disponibilizados uma por vez, via API
+> Neste exercício a base de desenvolvimento utilizada foi a `data/01_raw/data.csv` que é bem grande, com 25.697 linhas e a base de produção `data/01_raw/dataset_kobe_prod.parquet` continha 5.412. Isso faz sentido porque o modelo precisa de muito dados para aprender e generalizar bem. E os dados de produção, muitas vezes são menores ou até são disponibilizados uma por vez, via API
 
 * O aluno descreveu como monitorar a saúde do modelo no cenário com e sem a disponibilidade da variável alvo?
 > Podemos monitorar um modelos de várias formas, inclusive vistas em matérias anteriores, através de métricas (acurácia, recall, f1 score, log loss, etc.). Também podemoa gerar uma curva AUC-ROC. Algumas dessas métricas e curvas podem ser vistas no notebook `notebooks/logistic_regression_and_decision_tree.ipynb`
 
 * O aluno implementou um dashboard de monitoramento da operação usando Streamlit?
+> O projeto do strealit está em [streamlit/main.py](streamlit/main.py) e pode ser visto na imagem abaixo:
+> ![docs/streamlit_kobe.jpg](docs/streamlit_kobe.jpg)
 * O aluno descreveu as estratégias reativa e preditiva de retreinamento para o modelo em operação?
 
 ____

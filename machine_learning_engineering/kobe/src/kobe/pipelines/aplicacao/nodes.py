@@ -66,7 +66,7 @@ def registrar_resultados_mlflow(
     f1_value = f1_score(y_true['shot_made_flag'], previsoes)
     
     # Registra a run no MLflow
-    mlflow.set_experiment("kobe_bryant_shots")
+    mlflow.set_experiment("Aplicação")
     with mlflow.start_run(run_name="aplicacao"):
         # Registra as métricas
         mlflow.log_metric("log_loss", log_loss_score)
