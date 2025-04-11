@@ -13,13 +13,12 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=carregar_dados_producao,
                 inputs=["dataset_kobe_prod", "params:features"],
-                #inputs=["base_test", "params:features"],
                 outputs=["dados_producao_preparados", "y_true_prod"],
                 name="carregar_dados_producao_node",
             ),
             node(
                 func=aplicar_modelo,
-                inputs=["dados_producao_preparados", "modelo_treinado"],
+                inputs=["dados_producao_preparados", "logistic_regression_model"],
                 outputs=["dados_com_previsoes", "previsoes"],
                 name="aplicar_modelo_node",
             ),

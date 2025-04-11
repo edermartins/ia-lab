@@ -1,0 +1,15 @@
+artifact_uri: file:///home/zeta/ia-lab/machine_learning_engineering/kobe/notebooks/mlruns/337324300715366101/adb4594e77ee4639a76df88d910e0084/artifacts
+end_time: 1744396385719
+entry_point_name: ''
+experiment_id: '337324300715366101'
+lifecycle_stage: active
+run_id: adb4594e77ee4639a76df88d910e0084
+run_name: Random Forest Classifier
+run_uuid: adb4594e77ee4639a76df88d910e0084
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744396385684
+status: 3
+tags: []
+user_id: zeta

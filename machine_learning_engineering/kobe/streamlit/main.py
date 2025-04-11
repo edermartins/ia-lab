@@ -1,8 +1,8 @@
 import streamlit as st
-import pickle
 import numpy as np
 import mlflow
 import mlflow.sklearn
+import requests
 
 st.markdown("""
 # Kobe Bryant (Black Mamba)
@@ -16,10 +16,17 @@ O modelo irá prever se Kobe acertou ou não o arremesso com base nessas informa
 """
 )
 
-# Carregar o modelo de regressão logística do MLflow
-mlflow.set_tracking_uri('http://localhost:5000')
-modelo_uri = 'runs:/0850e313316a4a29bf2c26bd8c72a04c/logistic_regression_model'
-modelo = mlflow.sklearn.load_model(modelo_uri)
+def call_inference(data):
+    rows = [list(data.values())]
+
+    response = requests.post(
+        'http://localhost:5001/invocations', 
+        json={
+            'inputs': rows,
+        }
+    )
+    inference = response.json()
+    return inference['predictions'][0]
 
 # Interface do usuário para entrada de dados
 st.sidebar.header('Dados do Arremesso')
@@ -35,18 +42,23 @@ shot_distance = st.sidebar.number_input('Distância do arremesso (em pés)', min
 # Botão para fazer a previsão
 if st.sidebar.button('Verificar se acertou o arremesso'):
     # Preparar os dados para o modelo
-    dados = np.array([[lat, lon, minutes_remaining, period, playoffs, shot_distance]])
-    st.write(dados)
+    dados =  {
+        'latitude': lat,
+        'longitude': lon,
+        'minutes_remaining': minutes_remaining,
+        'period': period,
+        'playoffs': playoffs,
+        'shot_distance': shot_distance
+    }
     
-    # Fazer a previsão
-    previsao = modelo.predict(dados)
-    probabilidade = modelo.predict_proba(dados)[0][1]  # Probabilidade de acerto
+
+    previsao = call_inference(dados)
     
     # Exibir o resultado
-    if previsao[0] == 1:
-        st.success(f'Kobe acertou o arremesso! (Probabilidade: {probabilidade:.2%})')
+    if previsao == 1:
+        st.success(f'Kobe acertou o arremesso!')
     else:
-        st.error(f'Kobe não acertou o arremesso. (Probabilidade de acerto: {probabilidade:.2%})')
+        st.error(f'Kobe não acertou o arremesso.')
 
 
 

@@ -1,6 +1,6 @@
 # Matéria: Engenharia de Machine Learning [25E1_3]
 ## Aluno: Eder Jani Martins
-## Data: 07/03/2025
+## Data:11/04/2025
 
 ## Projeto disponível no Github
 
@@ -51,8 +51,8 @@ Para iniciar esta tarefa, baixe os dados que estão [localizados nesse link](htt
 > * data/03_primary/base_test.parquet: 20% do aruqivo `data/02_intermediate/data_filtered.parquet` para teste
 > * data/03_primary/base_train.parquet: 80% do aruqivo `data/02_intermediate/data_filtered.parquet` para treino
 > * data/03_primary/dados_producao_preparados.parquet: É a base `data/01_raw/dataset_kobe_prod.parquet` sem os campos nulos
-> * data/06_models/decision_tree_results.pkl: Árvore de decisão treinada
-> * data/06_models/logistic_regression_results.pkl: Regressão logística treinada
+> * data/06_models/decision_tree_model.pkl: Árvore de decisão treinada
+> * data/06_models/logistic_regression_model.pkl: Regressão logística treinada
 > * data/08_reporting/metricas_producao.json: Métricas do treinamento
 > * data/08_reporting/predictions_prod.parquet: Dados de previsão do modelo
 > Pipelines:
@@ -140,32 +140,39 @@ A base de dados contém informações sobre os arremessos realizados por Kobe Br
 
 
 
-# Template de Rubrica para ser utilizado com a extensão Rubricator
+# Template de Rubrica para apoiar a correção
 
 1. Desenvolver um sistema de coleta de dados usando APIs públicas
 * O aluno categorizou corretamente os dados?
 > [Clique aqui para ver](#descrições-do-dataset)
 * O aluno integrou a leitura dos dados corretamente à sua solução?
 * O aluno aplicou o modelo em produção (servindo como API ou como solução embarcada)?
-> TODO
+> O modelo foi servido via Mlflow [Clique aqui](#mlflow) para ver como executar o servidor e chamar a APO, disponível via URL.
+
 * O aluno indicou se o modelo é aderente a nova base de dados?
 > Após o treinamento com a base `data/01_raw/data.csv`, as predições utilizando a base `data/01_raw/dataset_kobe_prod.parquet` não foram boas. Obtive o `log_loss` = 0.6273682111956478 e `f1_score` = 0, o que indica que o modelo não conseguiu identificar nenhum elemento nessa base. 
 >
 > Isso pode ser visto no arquivo `data/08_reporting/predictions_prod.parquet`, onde todos os campos `prediction` estão em zero. Também observei que as probabilidades são bem baixas. O que indica que o modelo não é aderente á base de produção.
-
-
-
+>
+> Podemos ver no gráfico de importância de variáveis que latitude e longitude têm muita relevâvia. Isso fez o modelo não generalizar bem e ignorar as demais variáveis, que seriam muito mais relevante para prever os acertos:
+![kobe_variable_importance.jpg](docs/kobe_variable_importance.jpg)
 
 2. Criar uma solução de streaming de dados usando pipelines
 * O aluno criou um repositório git com a estrutura de projeto baseado no Framework TDSP da Microsoft?
 > Em acordo com o professor foi utilizado o padrão Kedro e está disponível na sessão [Projeto disponível no Github](#projeto-disponível-no-github)
+
 * O aluno criou um diagrama que mostra todas as etapas necessárias para a criação de modelos?
+> O diagrama pode ser visto [aqui](#desenho-da-solução)
+
 * O aluno treinou um modelo de regressão usando PyCaret e MLflow?
 > Foi criado no pipeline [Treinamento](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe/src/kobe/pipelines/treinamento)
+
 * O aluno calculou o Log Loss para o modelo de regressão e registrou no mlflow?
 > Foi criado no pipeline [Treinamento](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe/src/kobe/pipelines/treinamento)
+
 * O aluno treinou um modelo de árvore de decisao usando PyCaret e MLflow?
 > Foi criado no pipeline [Treinamento](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe/src/kobe/pipelines/treinamento)
+
 * O aluno calculou o Log Loss e F1 Score para o modelo de árvore de decisão e registrou no mlflow?
 > Foi criado no pipeline [Treinamento](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe/src/kobe/pipelines/treinamento)
 
@@ -177,10 +184,13 @@ A base de dados contém informações sobre os arremessos realizados por Kobe Br
 
 * O aluno usou o MLFlow para registrar a rodada "Preparação de Dados" com as métricas e argumentos relevantes?
 > Pode ser visto no arquivo `nodes.py` do pipeline [Preparação do Dados](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe/src/kobe/pipelines/preparacao_dados)
+
 * O aluno removeu os dados faltantes da base?
 > Pode ser visto no arquivo `nodes.py` do pipeline [Preparação do Dados](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe/src/kobe/pipelines/preparacao_dados)
+
 * O aluno selecionou as colunas indicadas para criar o modelo?
 > Pode ser visto no arquivo `nodes.py` do pipeline [Preparação do Dados](https://github.com/edermartins/ia-lab/tree/main/machine_learning_engineering/kobe/src/kobe/pipelines/preparacao_dados)
+
 * O aluno indicou quais as dimensões para a base preprocessada?
 > Disponível nem `notebooks/dataset_analysis.ipynb`
 > A base `data/01_raw/data.csv` tem (30697, 25) antes de ser limpa e (25697, 25) após a remoção dos campos nulos.
@@ -192,7 +202,7 @@ A base de dados contém informações sobre os arremessos realizados por Kobe Br
 * O aluno criou arquivos para cada fase do processamento e os armazenou nas pastas indicadas?
 > Os arquivos de código e configuração podem ser vista no projeto do Github, mas os arquivos gerados não vão para o repositório mas se o projeto for executado os dados serão gerados. Também estou adicionando uma imagem demostrando minha pasta:
 
-![imagem](./docs/data_files_screeshot.png)
+![imagem](./docs/data_files_screeshot.jpg)
 * O aluno separou em duas bases, uma para treino e outra para teste?
 > Foram criadas duas bases: `data/03_primary/base_train.parquet` e `data/03_primary/base_test.parquet`
 
@@ -202,24 +212,61 @@ A base de dados contém informações sobre os arremessos realizados por Kobe Br
 
 4. Estabelecer um método de como atualizar o modelo empregado em produção
 * O aluno identificou a diferença entre a base de desenvolvimento e produção?
-> Neste exercício a base de desenvolvimento utilizada foi a `data/01_raw/data.csv` que é bem grande, com 25.697 linhas e a base de produção `data/01_raw/dataset_kobe_prod.parquet` continha 5.412. Isso faz sentido porque o modelo precisa de muito dados para aprender e generalizar bem. E os dados de produção, muitas vezes são menores ou até são disponibilizados uma por vez, via API
+> Neste exercício a base utilizada para treinamento foi a `data/01_raw/data.csv`, que é bem grande, com 25.697 linhas e a base de produção `data/01_raw/dataset_kobe_prod.parquet` contem 5.412 registros. Isso faz sentido porque o modelo precisa de muito dados para aprender e generalizar bem. E os dados de produção, muitas vezes são menores ou até são disponibilizados uma por vez, via API.
 
 * O aluno descreveu como monitorar a saúde do modelo no cenário com e sem a disponibilidade da variável alvo?
 > Podemos monitorar um modelos de várias formas, inclusive vistas em matérias anteriores, através de métricas (acurácia, recall, f1 score, log loss, etc.). Também podemoa gerar uma curva AUC-ROC. Algumas dessas métricas e curvas podem ser vistas no notebook `notebooks/logistic_regression_and_decision_tree.ipynb`
+>
+> Caso a **variável alvo não esteja disponível**, podemo monitorar a distribuição de probabilidades previstas ao longo do tempo, analisar o drift nas cadasctetrísticas de entreda (features). Também podemo avaliar a estabilidade das previsões ou anomalias nas predições.
 
 * O aluno implementou um dashboard de monitoramento da operação usando Streamlit?
-> O projeto do strealit está em [streamlit/main.py](streamlit/main.py) e pode ser visto na imagem abaixo:
-> ![docs/streamlit_kobe.jpg](docs/streamlit_kobe.jpg)
-* O aluno descreveu as estratégias reativa e preditiva de retreinamento para o modelo em operação?
+> O projeto do strealit está em [streamlit/main.py](streamlit/main.py) e pode ser visto clicando [aqui](#streamlit)
 
-____
+
+* O aluno descreveu as estratégias reativa e preditiva de retreinamento para o modelo em operação?
+> **Estratégia Reativa**: Monitoramento das métricas de desempenho (log loss, F1-score). Quando as métricas ultrapassarem um limite pré-definido ou alguma diferença estabelecida, o modelo é retreinado ou atualizar o modelo com dados recentes,
+> 
+> **Estratégia Preditiva**: Análisar as tendências e padrões nos dados de entrada. Periódicamente realizaer retreinamento baseado em sazonalidade ou mudanças esperadas. Também é possível implementar modelos de drift para detectar mudanças na distribuição dos dados antes que afetem o desempenho.
+
+# MLFlow
+
+## Como servir a última versão do modelo
+Eu escolhi a Reguressão Logística que, no meu caso, está na versão 22
+
+```
+ mlflow models serve -m models:/LogisticRegressionModel/21 --env-manager=local --port 5001
+```
+### Como fazer uma chamada via API
+Este exemplo mostra uma chamada para o servidor executando localmente:
+
+```
+curl --location 'http://localhost:5001/invocations' \
+--data '{
+    "inputs": [[34.0413, -118.2318, 8, 1, 0, 3]]
+}'
+```
+
+
+# Streamlit
+
+## Iniciando o Streamlit
+O Streamlit vai iniciar na porta padrão (5000)
+
+```
+cd streamlit
+streamlit run main.py
+```
+> ![docs/streamlit_kobe.jpg](docs/streamlit_kobe.jpg)
+> Utilizando o modelo via Streamlit com a base ativa via Mlflow
+
+_____
 # Kedro Generated
 
 [![Powered by Kedro](https://img.shields.io/badge/powered_by-kedro-ffc900?logo=kedro)](https://kedro.org)
 
 ## Overview
 
-This is your new Kedro project with Kedro-Viz setup, which was generated using `kedro 0.19.11`.
+This is your new Kedro project with Kedro-Viz setup, which was generated using `kedro 0.19.12`.
 
 Take a look at the [Kedro documentation](https://docs.kedro.org) to get started.
 

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/zeta/ia-lab/machine_learning_engineering/kobe/notebooks/mlruns/337324300715366101/4ac3e6b8364b4196959dc70f2e8cbe74/artifacts
+end_time: 1744396384815
+entry_point_name: ''
+experiment_id: '337324300715366101'
+lifecycle_stage: active
+run_id: 4ac3e6b8364b4196959dc70f2e8cbe74
+run_name: Logistic Regression
+run_uuid: 4ac3e6b8364b4196959dc70f2e8cbe74
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1744396384780
+status: 3
+tags: []
+user_id: zeta

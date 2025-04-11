@@ -9,27 +9,34 @@ import mlflow
 import pandas as pd
 from pycaret.classification import *
 from sklearn.metrics import log_loss, f1_score, accuracy_score
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
 import numpy as np
+import os
 
-def train_logistic_regression(train_data: pd.DataFrame, test_data: pd.DataFrame) -> dict:
+def train_logistic_regression(train_data: pd.DataFrame, test_data: pd.DataFrame, session_id: int) -> dict:
     """
     Treina um modelo de regressão logística usando PyCaret e registra métricas no MLflow
     """
     # Inicializa o ambiente PyCaret
-    pycaret_setup = setup(data=train_data, target='shot_made_flag', session_id=42)
+    pycaret_setup = setup(data=train_data, target='shot_made_flag', session_id=session_id)
     
     # Treina o modelo de regressão logística
     lr_model = pycaret_setup.create_model('lr')
 
     tuned_lr_model = pycaret_setup.tune_model(lr_model, n_iter=100, optimize='AUC')
+
+    # Finaliza o modelo de regressão logística
+    final_model = pycaret_setup.finalize_model(tuned_lr_model)
     
     # Faz previsões no conjunto de teste
-    predictions = pycaret_setup.predict_model(tuned_lr_model, data=test_data)
+    predictions = pycaret_setup.predict_model(final_model, data=test_data)
     
     # Obtém as probabilidades usando o modelo diretamente
     X_test = test_data.drop('shot_made_flag', axis=1)
-    probabilities = tuned_lr_model.predict_proba(X_test)
+    probabilities = final_model.predict_proba(X_test)
     accuracy = accuracy_score(test_data['shot_made_flag'], predictions['prediction_label'])
+    
     # Debug detalhado
     print("\n=== Debug Regressão Logística ===")
     print("Colunas nas previsões:", predictions.columns.tolist())
@@ -57,32 +64,34 @@ def train_logistic_regression(train_data: pd.DataFrame, test_data: pd.DataFrame)
         mlflow.log_metric("log_loss", log_loss_value)
         mlflow.log_metric("f1_score", f1_value) 
         mlflow.log_metric("accuracy", accuracy)
-        mlflow.log_param("solver", tuned_lr_model.get_params()['solver'])
-        mlflow.log_param("multi_class", tuned_lr_model.get_params()['multi_class'])
 
-        mlflow.sklearn.log_model(tuned_lr_model, "logistic_regression_model", registered_model_name="LogisticRegressionModel")
+        mlflow.sklearn.log_model(final_model, "logistic_regression_model", registered_model_name="LogisticRegressionModel")
     
-    return {"model": tuned_lr_model, "log_loss": log_loss_value, "f1_score": f1_value}
+    return {"model": final_model, "log_loss": log_loss_value, "f1_score": f1_value}
 
-def train_decision_tree(train_data: pd.DataFrame, test_data: pd.DataFrame) -> dict:
+def train_decision_tree(train_data: pd.DataFrame, test_data: pd.DataFrame, session_id: int) -> dict:
     """
     Treina um modelo de árvore de decisão usando PyCaret e registra métricas no MLflow
     """
     # Inicializa o ambiente PyCaret
-    pycaret_setup = setup(data=train_data, target='shot_made_flag', session_id=42)
+    pycaret_setup = setup(data=train_data, target='shot_made_flag', session_id=session_id)
     
     # Treina o modelo de árvore de decisão
     dt_model = pycaret_setup.create_model('dt')
 
     # Tune do modelo de árvore de decisão
     tuned_dt_model = pycaret_setup.tune_model(dt_model, n_iter=100, optimize='AUC')
-    
+
+    # Finaliza o modelo de árvore de decisão
+    final_model = pycaret_setup.finalize_model(tuned_dt_model)
+
     # Faz previsões no conjunto de teste
-    predictions = pycaret_setup.predict_model(tuned_dt_model, data=test_data)
+    predictions = pycaret_setup.predict_model(final_model, data=test_data)
+
     
     # Obtém as probabilidades usando o modelo diretamente
     X_test = test_data.drop('shot_made_flag', axis=1)
-    probabilities = tuned_dt_model.predict_proba(X_test)
+    probabilities = final_model.predict_proba(X_test)
     accuracy = accuracy_score(test_data['shot_made_flag'], predictions['prediction_label'])
     
     # Debug detalhado
@@ -112,6 +121,26 @@ def train_decision_tree(train_data: pd.DataFrame, test_data: pd.DataFrame) -> di
         mlflow.log_metric("log_loss", log_loss_value)
         mlflow.log_metric("f1_score", f1_value)
         mlflow.log_metric("accuracy", accuracy)
-        mlflow.sklearn.log_model(tuned_dt_model, "decision_tree_model", registered_model_name="DecisionTreeModel")
+        mlflow.sklearn.log_model(final_model, "decision_tree_model", registered_model_name="DecisionTreeModel")
     
-    return {"model": tuned_dt_model, "log_loss": log_loss_value, "f1_score": f1_value}
+    return {"model": final_model, "log_loss": log_loss_value, "f1_score": f1_value}
+
+def plot_roc_curve(
+    data: pd.DataFrame,
+    model: dict,
+    session_id: int,
+    output_path: str
+) -> None:
+    """
+    Plota a curva ROC
+    """
+    exp = ClassificationExperiment()
+    exp.setup(data=data, target='shot_made_flag', session_id=session_id)
+
+    print("Output path:", output_path)
+
+    # Cria o diretório se não existir
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)    
+
+    # Gera o gráfico da curva ROC
+    exp.plot_model(model['model'], plot='auc', save=output_path)

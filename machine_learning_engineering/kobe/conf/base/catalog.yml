@@ -5,10 +5,14 @@
 dataset_kobe_dev:
   type: pandas.ParquetDataSet
   filepath: data/01_raw/dataset_kobe_dev.parquet
+  save_args:
+    engine: pyarrow
 
 dataset_kobe_prod:
   type: pandas.ParquetDataSet
   filepath: data/01_raw/dataset_kobe_prod.parquet
+  save_args:
+    engine: pyarrow
 
 data_raw:
   type: pandas.CSVDataSet
@@ -17,38 +21,58 @@ data_raw:
 data_filtered:
   type: pandas.ParquetDataSet
   filepath: data/02_intermediate/data_filtered.parquet
+  save_args:
+    engine: pyarrow
 
 base_train:
   type: pandas.ParquetDataSet
   filepath: data/03_primary/base_train.parquet
+  save_args:
+    engine: pyarrow
 
 base_test:
   type: pandas.ParquetDataSet
   filepath: data/03_primary/base_test.parquet
+  save_args:
+    engine: pyarrow 
 
-logistic_regression_results:
+logistic_regression_model:
   type: pickle.PickleDataSet
-  filepath: data/06_models/logistic_regression_results.pkl
+  filepath: data/06_models/logistic_regression_model.pkl
+  # Existe uma incompatibilidade entre o PickleDataSet e o MlflowModelTrackingDataset e não foi possível salvar o modelo no mlflow
+  # Fiz de tudo mas não consegui resolver
+  #type: kedro_mlflow.io.models.MlflowModelTrackingDataset
+  #flavor: mlflow.sklearn
+  #save_args:
+  #  registered_model_name: logistic_regression_model
 
-decision_tree_results:
+decision_tree_model:
   type: pickle.PickleDataSet
-  filepath: data/06_models/decision_tree_results.pkl
-
-modelo_treinado:
-  type: pickle.PickleDataSet
-  filepath: data/06_models/logistic_regression_results.pkl
+  filepath: data/06_models/decision_tree_model.pkl
+  # Existe uma incompatibilidade entre o PickleDataSet e o MlflowModelTrackingDataset e não foi possível salvar o modelo no mlflow
+  # Fiz de tudo mas não consegui resolver
+  #type: kedro_mlflow.io.models.MlflowModelTrackingDataset
+  #flavor: mlflow.sklearn
+  #save_args:
+  #  registered_model_name: decision_tree_model
 
 y_true_prod:
   type: pandas.ParquetDataSet
   filepath: data/01_raw/y_true_prod.parquet
+  save_args:
+    engine: pyarrow
 
 dados_producao_preparados:
   type: pandas.ParquetDataSet
   filepath: data/03_primary/dados_producao_preparados.parquet
+  save_args:
+    engine: pyarrow
 
 dados_com_previsoes:
   type: pandas.ParquetDataSet
   filepath: data/08_reporting/predictions_prod.parquet
+  save_args:
+    engine: pyarrow
 
 metricas_producao:
   type: json.JSONDataSet

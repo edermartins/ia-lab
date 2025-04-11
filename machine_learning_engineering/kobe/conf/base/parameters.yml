@@ -6,3 +6,8 @@ features:
   - playoffs
   - shot_distance
   - shot_made_flag
+
+session_id: 42
+
+output_roc_curve_lr_path: /home/zeta/ia-lab/machine_learning_engineering/kobe/data/08_reporting/roc_curve_lr
+output_roc_curve_dt_path: /home/zeta/ia-lab/machine_learning_engineering/kobe/data/08_reporting/roc_curve_dt

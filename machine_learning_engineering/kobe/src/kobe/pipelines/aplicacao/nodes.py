@@ -82,3 +82,4 @@ def registrar_resultados_mlflow(
         "log_loss": log_loss_score,
         "f1_score": f1_value
     }
+
