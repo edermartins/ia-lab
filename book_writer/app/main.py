@@ -29,6 +29,14 @@ environment_manager = EnvironmentManager()
 if "current_book_id" not in st.session_state:
     st.session_state.current_book_id = None
 
+# Inicializa o estado da sessão para eventos da linha do tempo
+if "event_title" not in st.session_state:
+    st.session_state.event_title = ""
+if "event_description" not in st.session_state:
+    st.session_state.event_description = ""
+if "event_date" not in st.session_state:
+    st.session_state.event_date = ""
+
 # Inicializa os componentes
 character_editor = CharacterEditor(llm_interface)
 environment_editor = EnvironmentEditor(llm_interface)
@@ -45,9 +53,20 @@ with st.sidebar:
     stories = db.get_all_stories()
     if stories:
         for story in stories:
-            if st.button(f"📚 {story['title']}", key=f"story_{story['id']}"):
-                st.session_state.current_book_id = story['id']
-                st.rerun()
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                if st.button(f"📚 {story['title']}", key=f"story_{story['id']}"):
+                    st.session_state.current_book_id = story['id']
+                    st.rerun()
+            with col2:
+                if st.button("🗑️", key=f"delete_story_{story['id']}"):
+                    if db.delete_story(story['id']):
+                        st.success(f"Livro '{story['title']}' excluído com sucesso!")
+                        if st.session_state.current_book_id == story['id']:
+                            st.session_state.current_book_id = None
+                        st.rerun()
+                    else:
+                        st.error(f"Erro ao excluir livro '{story['title']}'")
     
     # Botão para criar novo livro
     if st.button("Novo Livro"):
@@ -96,7 +115,7 @@ if page == "Visão Geral":
     
     with col3:
         story = db.get_story(st.session_state.current_book_id) if st.session_state.current_book_id else None
-        chapters = db.get_book_chapters(st.session_state.current_book_id) if st.session_state.current_book_id else {}
+        chapters = db.get_story_chapters(st.session_state.current_book_id) if st.session_state.current_book_id else {}
         st.metric("Capítulos", len(chapters))
         
         # Lista os 3 capítulos mais recentes

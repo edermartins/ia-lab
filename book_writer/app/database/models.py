@@ -125,10 +125,11 @@ class Database:
                 
                 cursor.execute("""
                     INSERT INTO characters (
-                        id, name, role, description, background, goals, conflicts
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                        id, story_id, name, role, description, background, goals, conflicts
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     char_id,
+                    character_data.get("story_id"),
                     character_data.get("name", ""),
                     character_data.get("role", ""),
                     character_data.get("description", ""),
@@ -199,19 +200,19 @@ class Database:
                 
                 cursor.execute("""
                     INSERT INTO environments (
-                        id, story_id, name, type, physical_description,
+                        id, story_id, name, type, physical_description, 
                         atmosphere, important_elements, significance, suggestions
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     env_id,
                     environment_data.get("story_id"),
-                    environment_data.get("name"),
-                    environment_data.get("type"),
-                    environment_data.get("physical_description"),
-                    environment_data.get("atmosphere"),
-                    environment_data.get("important_elements"),
-                    environment_data.get("significance"),
-                    environment_data.get("suggestions")
+                    environment_data.get("name", ""),
+                    environment_data.get("type", ""),
+                    environment_data.get("physical_description", ""),
+                    environment_data.get("atmosphere", ""),
+                    environment_data.get("important_elements", ""),
+                    environment_data.get("significance", ""),
+                    environment_data.get("suggestions", "")
                 ))
                 
                 conn.commit()
@@ -330,25 +331,9 @@ class Database:
                 """, (
                     chapter_id,
                     chapter_data.get("story_id"),
-                    chapter_data.get("title"),
-                    chapter_data.get("content")
+                    chapter_data.get("title", ""),
+                    chapter_data.get("content", "")
                 ))
-                
-                # Salva os personagens do capítulo
-                for char_id in chapter_data.get("characters", []):
-                    cursor.execute("""
-                        INSERT INTO chapter_characters (
-                            chapter_id, character_id
-                        ) VALUES (?, ?)
-                    """, (chapter_id, char_id))
-                
-                # Salva os ambientes do capítulo
-                for env_id in chapter_data.get("environments", []):
-                    cursor.execute("""
-                        INSERT INTO chapter_environments (
-                            chapter_id, environment_id
-                        ) VALUES (?, ?)
-                    """, (chapter_id, env_id))
                 
                 conn.commit()
                 return chapter_id
@@ -426,7 +411,7 @@ class Database:
             return None
     
     def save_timeline_event(self, event_data: Dict[str, Any]) -> str:
-        """Salva um novo evento na linha do tempo."""
+        """Salva um novo evento da linha do tempo no banco de dados."""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
@@ -439,10 +424,10 @@ class Database:
                 """, (
                     event_id,
                     event_data.get("story_id"),
-                    event_data.get("title"),
-                    event_data.get("description"),
-                    event_data.get("date"),
-                    event_data.get("importance")
+                    event_data.get("title", ""),
+                    event_data.get("description", ""),
+                    event_data.get("date", ""),
+                    event_data.get("importance", "")
                 ))
                 
                 conn.commit()
@@ -555,8 +540,10 @@ class Database:
                 
                 cursor.execute("DELETE FROM chapters WHERE story_id = ?", (story_id,))
                 
-                # Depois, exclui os personagens e ambientes
+                # Depois, exclui os personagens
                 cursor.execute("DELETE FROM characters WHERE story_id = ?", (story_id,))
+                
+                # Exclui os ambientes
                 cursor.execute("DELETE FROM environments WHERE story_id = ?", (story_id,))
                 
                 # Exclui os eventos da linha do tempo
@@ -566,7 +553,7 @@ class Database:
                 cursor.execute("DELETE FROM stories WHERE id = ?", (story_id,))
                 
                 conn.commit()
-            return True
+                return True
         except Exception as e:
             print(f"Erro ao excluir história: {e}")
             return False

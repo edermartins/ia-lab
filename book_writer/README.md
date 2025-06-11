@@ -1,76 +1,127 @@
-# Book Writer - Assistente de Escrita com IA
+# Book Writer
 
-Este é um aplicativo interativo que utiliza IA para auxiliar na escrita de livros. O sistema utiliza Streamlit para a interface, Google Gemini como LLM principal (com suporte para troca de LLMs) e LangChain para orquestração.
+Uma aplicação para auxiliar na escrita de livros, com recursos de geração de conteúdo usando IA.
 
-## Funcionalidades Principais
+## Funcionalidades
 
-- Criação e gerenciamento de personagens com perfis de IA
-- Desenvolvimento de ambientes e cenários
-- Geração de diálogos entre personagens
-- Controle de linha do tempo e continuidade da história
-- Revisão e coerência do conteúdo
-- Interface interativa com chat para cada elemento do livro
+### Gerenciamento de Livros
+- Criar novos livros
+- Editar detalhes do livro (título, gênero, sinopse, etc.)
+- Excluir livros e suas dependências
+- Visualizar lista de livros
 
-## Arquitetura
+### Personagens
+- Criar e editar personagens
+- Definir características físicas e psicológicas
+- Adicionar histórico e objetivos
+- Excluir personagens
+- Chat com personagens usando IA
 
-O aplicativo é construído com:
+### Ambientes
+- Criar e editar ambientes
+- Descrever características físicas
+- Definir atmosfera e elementos importantes
+- Excluir ambientes
 
-- **Streamlit**: Interface do usuário e interatividade
-- **Google Gemini**: Modelo de linguagem principal
-- **LangChain**: Framework para orquestração de LLMs e agentes
-- **Agentes de IA**: Personagens, ambientes e controladores de história
+### Capítulos
+- Criar e editar capítulos
+- Adicionar conteúdo
+- Associar personagens e ambientes aos capítulos
+- Excluir capítulos
+- Gerar conteúdo de capítulos usando IA
+
+### Linha do Tempo
+- Criar e editar eventos
+- Definir datas e importância
+- Excluir eventos
+
+### Geração de Conteúdo com IA
+- Gerar sinopse do livro
+- Gerar conteúdo de capítulos
+- Sugerir ideias para personagens
+- Chat interativo com personagens
+
+## Requisitos
+
+- Python 3.11+
+- Conda
+- Google Gemini API Key
+
+## Instalação
+
+1. Clone o repositório:
+```bash
+git clone [URL_DO_REPOSITÓRIO]
+cd book_writer
+```
+
+2. Crie e ative o ambiente conda:
+```bash
+conda create -n book_writer python=3.11
+conda activate book_writer
+```
+
+3. Instale as dependências:
+```bash
+pip install -r requirements.txt
+```
+
+4. Configure as variáveis de ambiente:
+```bash
+cp .env.example .env
+```
+Edite o arquivo `.env` e adicione sua chave da API do Google Gemini:
+```
+GOOGLE_API_KEY=sua_chave_aqui
+```
+
+## Uso
+
+### Iniciar a Aplicação
+```bash
+conda activate book_writer
+streamlit run app/main.py
+```
+
+### Zerar o Banco de Dados
+Para recriar o banco de dados do zero:
+```bash
+conda activate book_writer
+rm book_writer.db
+```
+O banco de dados será recriado automaticamente na próxima execução da aplicação.
+
+### Executar Seed (Dados Iniciais)
+Para adicionar dados iniciais ao banco:
+```bash
+conda activate book_writer
+python app/scripts/seed.py
+```
 
 ## Estrutura do Projeto
 
 ```
 book_writer/
 ├── app/
-│   ├── main.py
-│   ├── agents/
-│   │   ├── character_agent.py
-│   │   ├── environment_agent.py
-│   │   └── story_controller.py
-│   ├── components/
-│   │   ├── character_editor.py
-│   │   ├── environment_editor.py
-│   │   └── story_editor.py
-│   └── utils/
-│       ├── llm_interface.py
-│       └── config.py
-├── requirements.txt
-└── README.md
+│   ├── components/         # Componentes da interface
+│   ├── database/          # Modelos e operações do banco de dados
+│   ├── scripts/           # Scripts utilitários
+│   ├── utils/             # Utilitários e interfaces
+│   └── main.py           # Ponto de entrada da aplicação
+├── .env                   # Variáveis de ambiente
+├── .env.example          # Exemplo de variáveis de ambiente
+├── requirements.txt      # Dependências do projeto
+└── README.md            # Este arquivo
 ```
 
-## Instalação
+## Contribuindo
 
-1. Clone o repositório
-2. Instale as dependências:
-```bash
-pip install -r requirements.txt
-```
-3. Configure as variáveis de ambiente:
-```bash
-cp .env.example .env
-# Edite o arquivo .env com suas chaves de API
-```
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
 
-## Execução
+## Licença
 
-Para iniciar o aplicativo:
-
-```bash
-streamlit run app/main.py
-```
-
-## Uso
-
-1. Acesse a interface web através do navegador
-2. Comece criando seus personagens e definindo seus perfis
-3. Desenvolva os ambientes e cenários
-4. Use o chat interativo para refinar cada elemento
-5. Gere diálogos e cenas usando os agentes de IA
-6. Revise e mantenha a coerência da história
-
-## Contribuição
-
-Contribuições são bem-vindas! Por favor, leia as diretrizes de contribuição antes de submeter pull requests. 
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes. 

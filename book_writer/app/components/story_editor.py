@@ -35,6 +35,8 @@ class StoryEditor:
             st.session_state.timeline_event_date = ""
         if "story_suggestions" not in st.session_state:
             st.session_state.story_suggestions = ""
+        if "editing_story" not in st.session_state:
+            st.session_state.editing_story = False
     
     def render(self, story_id: str = None):
         """Renderiza o editor de história."""
@@ -53,7 +55,7 @@ class StoryEditor:
             
         # Mostra os detalhes da história
         st.subheader("Detalhes da História")
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns([2, 2, 1])
         with col1:
             st.write(f"**Título:** {story['title']}")
             st.write(f"**Gênero:** {story['genre']}")
@@ -63,6 +65,64 @@ class StoryEditor:
             st.write(f"**Estilo Narrativo:** {story['narrative_style']}")
             st.write(f"**Ambientação:** {story['setting']}")
             st.write(f"**Sinopse:** {story['description']}")
+        with col3:
+            if st.button("✏️ Editar Livro"):
+                st.session_state.editing_story = True
+                st.session_state.story = {
+                    "title": story['title'],
+                    "genre": story['genre'],
+                    "synopsis": story['description'],
+                    "target_audience": story['target_audience'],
+                    "main_theme": story['main_theme'],
+                    "narrative_style": story['narrative_style'],
+                    "setting": story['setting']
+                }
+                st.rerun()
+        
+        # Se estiver editando, mostra o formulário de edição
+        if st.session_state.get("editing_story", False):
+            st.divider()
+            with st.form("edit_story_form", clear_on_submit=False):
+                st.subheader("Editar Detalhes da História")
+                
+                # Campos do formulário
+                title = st.text_input("Título do Livro", value=st.session_state.story.get("title", ""))
+                genre = st.text_input("Gênero", value=st.session_state.story.get("genre", ""))
+                synopsis = st.text_area("Sinopse", value=st.session_state.story.get("synopsis", ""))
+                target_audience = st.text_input("Público-Alvo", value=st.session_state.story.get("target_audience", ""))
+                main_theme = st.text_input("Tema Principal", value=st.session_state.story.get("main_theme", ""))
+                narrative_style = st.text_input("Estilo Narrativo", value=st.session_state.story.get("narrative_style", ""))
+                setting = st.text_area("Ambientação", value=st.session_state.story.get("setting", ""))
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    if st.form_submit_button("Salvar Alterações"):
+                        if not title:
+                            st.warning("O título do livro é obrigatório.")
+                            return
+                        
+                        story_data = {
+                            "id": story_id,
+                            "title": title,
+                            "genre": genre,
+                            "description": synopsis,
+                            "target_audience": target_audience,
+                            "main_theme": main_theme,
+                            "narrative_style": narrative_style,
+                            "setting": setting
+                        }
+                        
+                        if self.db.update_story(story_data):
+                            st.success("Livro atualizado com sucesso!")
+                            st.session_state.editing_story = False
+                            st.rerun()
+                        else:
+                            st.error("Erro ao atualizar livro.")
+                
+                with col2:
+                    if st.form_submit_button("Cancelar"):
+                        st.session_state.editing_story = False
+                        st.rerun()
         
         st.divider()
         
@@ -225,14 +285,15 @@ class StoryEditor:
     
     def _render_timeline_form(self, story_id: str):
         """Renderiza o formulário de edição do evento da linha do tempo."""
-        with st.form("timeline_event_form", clear_on_submit=False):
+        with st.form("timeline_event_form", clear_on_submit=True):
             st.subheader("Evento da Linha do Tempo")
             
             title = st.text_input("Título", value=st.session_state.event_title, key="event_title")
             description = st.text_area("Descrição", value=st.session_state.event_description, key="event_description", height=200)
             date = st.text_input("Data", value=st.session_state.event_date, key="event_date")
             
-            if st.form_submit_button("Salvar Evento"):
+            submitted = st.form_submit_button("Salvar Evento")
+            if submitted:
                 if not title:
                     st.warning("O título do evento é obrigatório.")
                     return

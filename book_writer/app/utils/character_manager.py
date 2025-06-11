@@ -47,4 +47,8 @@ class CharacterManager:
             return True
         except Exception as e:
             print(f"Erro ao atualizar personagem: {e}")
-            return False 
+            return False
+
+    def get_book_characters(self, story_id: str) -> Dict[str, Dict]:
+        """Recupera todos os personagens de um livro específico."""
+        return self.db.get_book_characters(story_id) 
