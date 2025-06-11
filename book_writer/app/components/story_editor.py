@@ -2,12 +2,15 @@ import streamlit as st
 from typing import Dict, List
 import json
 from utils.llm_interface import LLMInterface
+import asyncio
+from database.models import Database
 
 class StoryEditor:
     def __init__(self, llm_interface: LLMInterface):
         self.llm = llm_interface
+        self.db = Database()
         
-        # Carregar dados da história
+        # Inicializa as variáveis de estado se não existirem
         if "story" not in st.session_state:
             st.session_state.story = {
                 "title": "",
@@ -16,272 +19,368 @@ class StoryEditor:
                 "chapters": [],
                 "timeline": []
             }
+        if "current_chapter" not in st.session_state:
+            st.session_state.current_chapter = None
+        if "chapter_title" not in st.session_state:
+            st.session_state.chapter_title = ""
+        if "chapter_content" not in st.session_state:
+            st.session_state.chapter_content = ""
+        if "chapter_suggestions" not in st.session_state:
+            st.session_state.chapter_suggestions = ""
+        if "timeline_event_title" not in st.session_state:
+            st.session_state.timeline_event_title = ""
+        if "timeline_event_description" not in st.session_state:
+            st.session_state.timeline_event_description = ""
+        if "timeline_event_date" not in st.session_state:
+            st.session_state.timeline_event_date = ""
+        if "story_suggestions" not in st.session_state:
+            st.session_state.story_suggestions = ""
     
-    def render(self):
+    def render(self, story_id: str = None):
+        """Renderiza o editor de história."""
         st.header("Editor de História")
         
-        # Sidebar para navegação
-        with st.sidebar:
-            st.subheader("Navegação")
-            page = st.radio(
-                "Selecione uma seção:",
-                ["Visão Geral", "Capítulos", "Linha do Tempo", "Revisão"]
-            )
+        if not story_id:
+            st.info("Preencha os detalhes do seu novo livro abaixo.")
+            self._render_story_form()
+            return
         
-        # Renderizar a seção selecionada
-        if page == "Visão Geral":
-            self._render_overview()
-        elif page == "Capítulos":
-            self._render_chapters()
-        elif page == "Linha do Tempo":
-            self._render_timeline()
-        elif page == "Revisão":
-            self._render_review()
-    
-    def _render_overview(self):
-        st.subheader("Visão Geral da História")
-        
-        # Informações básicas
-        title = st.text_input("Título do Livro", value=st.session_state.story["title"])
-        genre = st.selectbox(
-            "Gênero",
-            ["Ficção", "Fantasia", "Ficção Científica", "Romance", "Mistério", "Aventura"],
-            index=0 if not st.session_state.story["genre"] else ["Ficção", "Fantasia", "Ficção Científica", "Romance", "Mistério", "Aventura"].index(st.session_state.story["genre"])
-        )
-        
-        # Sinopse
-        st.subheader("Sinopse")
-        synopsis = st.text_area(
-            "Sinopse da História",
-            value=st.session_state.story["synopsis"],
-            height=200
-        )
-        
-        # Botões de ação
+        # Carrega os dados da história
+        story = self.db.get_story(story_id)
+        if not story:
+            st.error("História não encontrada.")
+            return
+            
+        # Mostra os detalhes da história
+        st.subheader("Detalhes da História")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("Salvar Informações"):
-                self._save_story_info({
-                    "title": title,
-                    "genre": genre,
-                    "synopsis": synopsis
-                })
-        
+            st.write(f"**Título:** {story['title']}")
+            st.write(f"**Gênero:** {story['genre']}")
+            st.write(f"**Público-Alvo:** {story['target_audience']}")
+            st.write(f"**Tema Principal:** {story['main_theme']}")
         with col2:
-            if st.button("Gerar Sinopse com IA"):
-                self._generate_synopsis(title, genre)
+            st.write(f"**Estilo Narrativo:** {story['narrative_style']}")
+            st.write(f"**Ambientação:** {story['setting']}")
+            st.write(f"**Sinopse:** {story['description']}")
         
-        # Estatísticas
-        st.subheader("Estatísticas")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Capítulos", len(st.session_state.story["chapters"]))
-        with col2:
-            st.metric("Personagens", len(st.session_state.get("characters", {})))
-        with col3:
-            st.metric("Ambientes", len(st.session_state.get("environments", {})))
-    
-    def _render_chapters(self):
-        st.subheader("Capítulos")
+        st.divider()
         
-        # Lista de capítulos
-        for i, chapter in enumerate(st.session_state.story["chapters"]):
-            with st.expander(f"Capítulo {i+1}: {chapter['title']}"):
-                # Editar capítulo
-                title = st.text_input("Título", value=chapter["title"], key=f"chapter_title_{i}")
-                content = st.text_area("Conteúdo", value=chapter["content"], height=200, key=f"chapter_content_{i}")
-                
-                # Personagens no capítulo
-                st.subheader("Personagens Presentes")
-                characters = st.multiselect(
-                    "Selecione os personagens",
-                    options=list(st.session_state.get("characters", {}).keys()),
-                    default=chapter.get("characters", []),
-                    key=f"chapter_characters_{i}"
-                )
-                
-                # Ambientes do capítulo
-                st.subheader("Ambientes do Capítulo")
-                environments = st.multiselect(
-                    "Selecione os ambientes",
-                    options=list(st.session_state.get("environments", {}).keys()),
-                    default=chapter.get("environments", []),
-                    key=f"chapter_environments_{i}"
-                )
-                
-                # Botões de ação
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("Salvar Capítulo", key=f"save_chapter_{i}"):
-                        self._save_chapter(i, {
-                            "title": title,
-                            "content": content,
-                            "characters": characters,
-                            "environments": environments
-                        })
-                
-                with col2:
-                    if st.button("Gerar com IA", key=f"generate_chapter_{i}"):
-                        self._generate_chapter_content(i, title, characters, environments)
-        
-        # Adicionar novo capítulo
-        if st.button("Adicionar Novo Capítulo"):
-            st.session_state.story["chapters"].append({
-                "title": f"Capítulo {len(st.session_state.story['chapters']) + 1}",
-                "content": "",
-                "characters": [],
-                "environments": []
-            })
-            st.experimental_rerun()
-    
-    def _render_timeline(self):
-        st.subheader("Linha do Tempo")
-        
-        # Visualização da linha do tempo
-        for i, event in enumerate(st.session_state.story["timeline"]):
-            with st.expander(f"Evento {i+1}: {event['title']}"):
-                # Editar evento
-                title = st.text_input("Título do Evento", value=event["title"], key=f"event_title_{i}")
-                description = st.text_area("Descrição", value=event["description"], height=100, key=f"event_description_{i}")
-                chapter = st.number_input("Capítulo", value=event["chapter"], min_value=1, key=f"event_chapter_{i}")
-                
-                # Botões de ação
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("Salvar Evento", key=f"save_event_{i}"):
-                        self._save_timeline_event(i, {
-                            "title": title,
-                            "description": description,
-                            "chapter": chapter
-                        })
-                
-                with col2:
-                    if st.button("Remover Evento", key=f"remove_event_{i}"):
-                        self._remove_timeline_event(i)
-        
-        # Adicionar novo evento
-        if st.button("Adicionar Novo Evento"):
-            st.session_state.story["timeline"].append({
-                "title": f"Evento {len(st.session_state.story['timeline']) + 1}",
-                "description": "",
-                "chapter": 1
-            })
-            st.experimental_rerun()
-    
-    def _render_review(self):
-        st.subheader("Revisão e Coerência")
-        
-        # Análise de coerência
-        if st.button("Analisar Coerência"):
-            self._analyze_coherence()
-        
-        # Sugestões de melhoria
-        if "coherence_analysis" in st.session_state:
-            st.subheader("Análise de Coerência")
-            st.write(st.session_state.coherence_analysis)
+        # Sidebar para lista de capítulos e eventos
+        with st.sidebar:
+            st.subheader("Capítulos")
             
-            # Sugestões específicas
-            if "suggestions" in st.session_state.coherence_analysis:
-                st.subheader("Sugestões de Melhoria")
-                for suggestion in st.session_state.coherence_analysis["suggestions"]:
-                    st.write(f"- {suggestion}")
+            # Botão para criar novo capítulo
+            if st.button("Novo Capítulo"):
+                st.session_state.chapter_title = ""
+                st.session_state.chapter_content = ""
+                st.session_state.current_chapter = None
+                st.rerun()
+            
+            # Lista de capítulos
+            chapters = self.db.get_story_chapters(story_id)
+            if chapters:
+                for chapter_id, chapter in chapters.items():
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        if st.button(f"📖 {chapter['title']}", key=f"chapter_{chapter_id}"):
+                            st.session_state.current_chapter = chapter_id
+                            st.session_state.chapter_title = chapter.get("title", "")
+                            st.session_state.chapter_content = chapter.get("content", "")
+                            st.rerun()
+                    with col2:
+                        if st.button("🗑️", key=f"delete_chapter_{chapter_id}"):
+                            if self.db.delete_chapter(chapter_id):
+                                st.success(f"Capítulo {chapter['title']} excluído com sucesso!")
+                                if st.session_state.current_chapter == chapter_id:
+                                    st.session_state.current_chapter = None
+                                    st.session_state.chapter_title = ""
+                                    st.session_state.chapter_content = ""
+                                st.rerun()
+                            else:
+                                st.error(f"Erro ao excluir capítulo {chapter['title']}")
+            
+            st.divider()
+            st.subheader("Eventos da Linha do Tempo")
+            
+            # Botão para criar novo evento
+            if st.button("Novo Evento"):
+                st.session_state.event_title = ""
+                st.session_state.event_description = ""
+                st.session_state.event_date = ""
+                st.session_state.current_event = None
+                st.rerun()
+            
+            # Lista de eventos
+            events = self.db.get_story_timeline_events(story_id)
+            if events:
+                for event_id, event in events.items():
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        if st.button(f"📅 {event['title']}", key=f"event_{event_id}"):
+                            st.session_state.current_event = event_id
+                            st.session_state.event_title = event.get("title", "")
+                            st.session_state.event_description = event.get("description", "")
+                            st.session_state.event_date = event.get("date", "")
+                            st.rerun()
+                    with col2:
+                        if st.button("🗑️", key=f"delete_event_{event_id}"):
+                            if self.db.delete_timeline_event(event_id):
+                                st.success(f"Evento {event['title']} excluído com sucesso!")
+                                if st.session_state.current_event == event_id:
+                                    st.session_state.current_event = None
+                                    st.session_state.event_title = ""
+                                    st.session_state.event_description = ""
+                                    st.session_state.event_date = ""
+                                st.rerun()
+                            else:
+                                st.error(f"Erro ao excluir evento {event['title']}")
+        
+        # Área principal
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            self._render_chapter_form(story_id)
+        
+        with col2:
+            self._render_timeline_form(story_id)
     
-    def _save_story_info(self, info: Dict):
-        """Salva as informações básicas da história."""
-        st.session_state.story.update(info)
-        st.success("Informações salvas com sucesso!")
+    def _render_story_form(self):
+        """Renderiza o formulário de edição da história."""
+        with st.form("story_form", clear_on_submit=False):
+            st.subheader("Detalhes da História")
+            
+            # Campos do formulário
+            title = st.text_input("Título do Livro", value=st.session_state.story.get("title", ""))
+            volume = st.number_input("Número do Volume", min_value=1, value=1)
+            genre = st.text_input("Gênero", value=st.session_state.story.get("genre", ""))
+            synopsis = st.text_area("Sinopse", value=st.session_state.story.get("synopsis", ""))
+            target_audience = st.text_input("Público-Alvo", value=st.session_state.story.get("target_audience", ""))
+            main_theme = st.text_input("Tema Principal", value=st.session_state.story.get("main_theme", ""))
+            narrative_style = st.text_input("Estilo Narrativo", value=st.session_state.story.get("narrative_style", ""))
+            setting = st.text_area("Ambientação", value=st.session_state.story.get("setting", ""))
+            
+            suggestions = st.text_area(
+                "Sugestões para a História (opcional)",
+                value=st.session_state.story_suggestions,
+                help="Digite sugestões ou ideias para a história. Deixe em branco para geração automática."
+            )
+            
+            # Botões de ação
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.form_submit_button("Salvar História"):
+                    if not title:
+                        st.warning("O título do livro é obrigatório.")
+                        return
+                    
+                    self._save_story_info({
+                        "title": f"{title} - Volume {volume}",
+                        "genre": genre,
+                        "synopsis": synopsis,
+                        "target_audience": target_audience,
+                        "main_theme": main_theme,
+                        "narrative_style": narrative_style,
+                        "setting": setting,
+                        "suggestions": suggestions
+                    })
+            
+            with col2:
+                if st.form_submit_button("Gerar Sinopse com IA"):
+                    asyncio.run(self._generate_synopsis(title, genre, suggestions))
     
-    def _save_chapter(self, index: int, chapter_data: Dict):
-        """Salva os dados de um capítulo."""
-        st.session_state.story["chapters"][index] = chapter_data
-        st.success("Capítulo salvo com sucesso!")
+    def _render_chapter_form(self, story_id: str):
+        """Renderiza o formulário de edição do capítulo."""
+        with st.form("chapter_form", clear_on_submit=False):
+            st.subheader("Detalhes do Capítulo")
+            
+            title = st.text_input("Título", value=st.session_state.chapter_title, key="chapter_title")
+            content = st.text_area("Conteúdo", value=st.session_state.chapter_content, key="chapter_content", height=300)
+            
+            if st.form_submit_button("Salvar Capítulo"):
+                if not title:
+                    st.warning("O título do capítulo é obrigatório.")
+                    return
+                
+                chapter_data = {
+                    "title": title,
+                    "content": content,
+                    "story_id": story_id
+                }
+                
+                if st.session_state.current_chapter:
+                    chapter_data["id"] = st.session_state.current_chapter
+                    if self.db.update_chapter(chapter_data):
+                        st.success(f"Capítulo {title} atualizado com sucesso!")
+                    else:
+                        st.error(f"Erro ao atualizar capítulo {title}")
+                else:
+                    chapter_id = self.db.save_chapter(chapter_data)
+                    if chapter_id:
+                        st.success(f"Capítulo {title} salvo com sucesso!")
+                        st.session_state.current_chapter = chapter_id
+                    else:
+                        st.error(f"Erro ao salvar capítulo {title}")
+                st.rerun()
     
-    def _save_timeline_event(self, index: int, event_data: Dict):
-        """Salva um evento na linha do tempo."""
-        st.session_state.story["timeline"][index] = event_data
-        st.success("Evento salvo com sucesso!")
+    def _render_timeline_form(self, story_id: str):
+        """Renderiza o formulário de edição do evento da linha do tempo."""
+        with st.form("timeline_event_form", clear_on_submit=False):
+            st.subheader("Evento da Linha do Tempo")
+            
+            title = st.text_input("Título", value=st.session_state.event_title, key="event_title")
+            description = st.text_area("Descrição", value=st.session_state.event_description, key="event_description", height=200)
+            date = st.text_input("Data", value=st.session_state.event_date, key="event_date")
+            
+            if st.form_submit_button("Salvar Evento"):
+                if not title:
+                    st.warning("O título do evento é obrigatório.")
+                    return
+                
+                event_data = {
+                    "title": title,
+                    "description": description,
+                    "date": date,
+                    "story_id": story_id
+                }
+                
+                if st.session_state.current_event:
+                    event_data["id"] = st.session_state.current_event
+                    if self.db.update_timeline_event(event_data):
+                        st.success(f"Evento {title} atualizado com sucesso!")
+                    else:
+                        st.error(f"Erro ao atualizar evento {title}")
+                else:
+                    event_id = self.db.save_timeline_event(event_data)
+                    if event_id:
+                        st.success(f"Evento {title} salvo com sucesso!")
+                        st.session_state.current_event = event_id
+                    else:
+                        st.error(f"Erro ao salvar evento {title}")
+                st.rerun()
     
-    def _remove_timeline_event(self, index: int):
-        """Remove um evento da linha do tempo."""
-        st.session_state.story["timeline"].pop(index)
-        st.success("Evento removido com sucesso!")
-        st.experimental_rerun()
-    
-    def _generate_synopsis(self, title: str, genre: str):
+    async def _generate_synopsis(self, title: str, genre: str, suggestions: str = ""):
         """Gera uma sinopse usando IA."""
-        if not title:
-            st.warning("Por favor, insira um título para a história.")
+        if not title or not genre:
+            st.warning("Por favor, insira o título e o gênero da história.")
             return
         
         prompt = f"""
-        Crie uma sinopse envolvente para um livro com as seguintes informações:
+        Crie uma sinopse envolvente e profissional para um livro com as seguintes informações:
         Título: {title}
         Gênero: {genre}
-        
-        A sinopse deve ser concisa mas informativa, despertando interesse no leitor.
         """
         
-        response = self.llm.generate_response(prompt)
-        st.session_state.story["synopsis"] = response
-        st.success("Sinopse gerada com sucesso!")
+        if suggestions:
+            prompt += f"""
+            Sugestões e ideias para a história:
+            {suggestions}
+            """
+        
+        prompt += """
+        A sinopse deve ser concisa, envolvente e dar uma visão geral da história sem revelar spoilers importantes.
+        Mantenha um tom profissional e adequado ao gênero.
+        """
+        
+        try:
+            response = await self.llm.generate_response(prompt)
+            st.session_state.story["synopsis"] = response
+            st.success("Sinopse gerada com sucesso!")
+            st.rerun()
+        except Exception as e:
+            st.error(f"Erro ao gerar sinopse: {str(e)}")
     
-    def _generate_chapter_content(self, chapter_index: int, title: str, characters: List[str], environments: List[str]):
-        """Gera o conteúdo de um capítulo usando IA."""
+    async def _generate_chapter_content(self, title: str, suggestions: str = ""):
+        """Gera o conteúdo do capítulo usando IA."""
         if not title:
-            st.warning("Por favor, insira um título para o capítulo.")
+            st.warning("Por favor, insira o título do capítulo.")
             return
         
-        # Obter informações dos personagens e ambientes
-        character_info = [st.session_state.characters[char] for char in characters if char in st.session_state.characters]
-        environment_info = [st.session_state.environments[env] for env in environments if env in st.session_state.environments]
-        
+        story = st.session_state.story
         prompt = f"""
         Crie o conteúdo para um capítulo de livro com as seguintes informações:
+        
+        História: {story.get('title', '')}
+        Gênero: {story.get('genre', '')}
         Título do Capítulo: {title}
-        
-        Personagens presentes:
-        {json.dumps(character_info, indent=2)}
-        
-        Ambientes:
-        {json.dumps(environment_info, indent=2)}
-        
-        Por favor, crie um capítulo envolvente que desenvolva a história e os personagens.
         """
         
-        response = self.llm.generate_response(prompt)
-        st.session_state.story["chapters"][chapter_index]["content"] = response
-        st.success("Conteúdo do capítulo gerado com sucesso!")
-    
-    def _analyze_coherence(self):
-        """Analisa a coerência da história."""
-        story_data = {
-            "title": st.session_state.story["title"],
-            "genre": st.session_state.story["genre"],
-            "synopsis": st.session_state.story["synopsis"],
-            "chapters": st.session_state.story["chapters"],
-            "timeline": st.session_state.story["timeline"],
-            "characters": st.session_state.get("characters", {}),
-            "environments": st.session_state.get("environments", {})
-        }
+        if suggestions:
+            prompt += f"""
+            Sugestões e ideias para o capítulo:
+            {suggestions}
+            """
         
-        prompt = f"""
-        Analise a coerência da seguinte história e forneça sugestões de melhoria:
-        {json.dumps(story_data, indent=2)}
-        
-        Verifique:
-        1. Consistência da trama
-        2. Desenvolvimento dos personagens
-        3. Uso dos ambientes
-        4. Continuidade da linha do tempo
-        5. Coerência com o gênero
-        
-        Formate a resposta em JSON com as chaves: analysis, suggestions
+        prompt += """
+        O conteúdo deve ser envolvente, manter a consistência com o gênero e estilo da história,
+        e avançar a narrativa de forma significativa.
         """
         
-        response = self.llm.generate_response(prompt)
         try:
-            analysis = json.loads(response)
-            st.session_state.coherence_analysis = analysis
-            st.success("Análise de coerência concluída!")
-        except json.JSONDecodeError:
-            st.error("Erro ao processar a análise de coerência") 
+            response = await self.llm.generate_response(prompt)
+            st.session_state.chapter_content = response
+            st.success("Conteúdo do capítulo gerado com sucesso!")
+            st.rerun()
+        except Exception as e:
+            st.error(f"Erro ao gerar conteúdo do capítulo: {str(e)}")
+    
+    def _save_story_info(self, info: Dict):
+        """Salva as informações da história no banco de dados."""
+        try:
+            story_data = {
+                "title": info["title"],
+                "description": info["synopsis"],
+                "genre": info["genre"],
+                "target_audience": info["target_audience"],
+                "main_theme": info["main_theme"],
+                "narrative_style": info["narrative_style"],
+                "setting": info["setting"]
+            }
+            
+            story_id = self.db.save_story(story_data)
+            if story_id:
+                st.session_state.current_book_id = story_id
+                st.success("História salva com sucesso!")
+                st.rerun()
+            else:
+                st.error("Erro ao salvar história.")
+        except Exception as e:
+            st.error(f"Erro ao salvar história: {e}")
+    
+    def _save_chapter(self, chapter_data: Dict):
+        """Salva os dados do capítulo."""
+        if not chapter_data.get("title"):
+            st.warning("O título do capítulo é obrigatório.")
+            return
+        
+        chapters = st.session_state.story.get("chapters", [])
+        if st.session_state.current_chapter is not None:
+            # Atualiza capítulo existente
+            chapters[st.session_state.current_chapter] = chapter_data
+        else:
+            # Adiciona novo capítulo
+            chapters.append(chapter_data)
+        
+        st.session_state.story["chapters"] = chapters
+        
+        # Salva no banco de dados
+        self.db.save_chapter(chapter_data)
+        
+        st.success("Capítulo salvo com sucesso!")
+        st.rerun()
+    
+    def _save_timeline_event(self, event_data: Dict):
+        """Salva os dados do evento da timeline."""
+        if not event_data.get("title"):
+            st.warning("O título do evento é obrigatório.")
+            return
+        
+        timeline = st.session_state.story.get("timeline", [])
+        timeline.append(event_data)
+        st.session_state.story["timeline"] = timeline
+        
+        # Salva no banco de dados
+        self.db.save_timeline_event(event_data)
+        
+        st.success("Evento salvo com sucesso!")
+        st.rerun() 
