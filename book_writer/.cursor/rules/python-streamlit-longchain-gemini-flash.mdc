@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Responder no chat em português do Brasil e gerar códigos e comentários em Inglês.
+O frontend deve ser feito em Streamlit, toda interação com as LLM deve utilizar o Langchain.
+Utilize as boas práticas do Python, segundo as PEP (Python Enhancement Proposals).
+Estou usando Python 3.11 e use conda para criar e apagar ambientes virtuais.
