@@ -6,21 +6,23 @@ from langchain.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field
 from src.utils.logger import logger
 
-class EnvironmentSuggestion(BaseModel):
-    nome: str = Field(description="Nome do ambiente")
-    tipo: str = Field(description="Tipo de ambiente (ex: floresta, cidade, castelo, etc.)")
-    descricao: str = Field(description="Descrição detalhada do ambiente")
-    atmosfera: str = Field(description="Atmosfera e clima do ambiente")
-    elementos_importantes: str = Field(description="Elementos e objetos importantes no ambiente")
-    significado: str = Field(description="Significado simbólico ou importância do ambiente na história")
+class PlotSuggestion(BaseModel):
+    titulo: str = Field(description="Título do livro")
+    volume: str = Field(description="Número do volume (se aplicável)")
+    autor: str = Field(description="Nome do autor")
+    genero: str = Field(description="Gênero literário")
+    idioma: str = Field(description="Idioma do livro")
+    sinopse: str = Field(description="Breve descrição do enredo")
+    estilo_narrativo: str = Field(description="Estilo de narração (ex: primeira pessoa, terceira pessoa, epistolar, etc.)")
+    publico_alvo: str = Field(description="Público alvo do livro (ex: infantil, juvenil, adulto, etc.)")
 
-class EnvironmentSuggestionList(BaseModel):
-    suggestions: List[EnvironmentSuggestion] = Field(description="Lista de sugestões de ambientes")
+class PlotSuggestionList(BaseModel):
+    suggestions: List[PlotSuggestion] = Field(description="Lista de sugestões de enredo")
 
-class EnvironmentSuggestionAgent:
+class PlotSuggestionAgent:
     def __init__(self):
-        """Inicializa o agente de sugestões de ambientes."""
-        logger.info("Inicializando EnvironmentSuggestionAgent")
+        """Inicializa o agente de sugestões de enredo."""
+        logger.info("Inicializando PlotSuggestionAgent")
         
         # Configurar a API do Google
         api_key = os.getenv("GOOGLE_API_KEY")
@@ -34,17 +36,16 @@ class EnvironmentSuggestionAgent:
             temperature=0.7,
             top_p=0.8,
             top_k=40,
-            max_output_tokens=2048,
-            convert_system_message_to_human=True
+            max_output_tokens=2048
         )
         
         # Configurar o parser de saída
-        self.parser = PydanticOutputParser(pydantic_object=EnvironmentSuggestionList)
+        self.parser = PydanticOutputParser(pydantic_object=PlotSuggestionList)
         
         # Configurar o template do prompt
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", """Você é um assistente especializado em criar sugestões de ambientes e cenários. 
-            Com base na descrição fornecida, crie uma sugestão detalhada de ambiente.
+            ("system", """Você é um assistente especializado em criar sugestões de livros. 
+            Com base na descrição fornecida, crie uma sugestão detalhada de livro.
             
             {format_instructions}
             
@@ -57,17 +58,17 @@ class EnvironmentSuggestionAgent:
             ("human", "Descrição: {description}")
         ])
         
-        logger.info("EnvironmentSuggestionAgent inicializado com sucesso")
+        logger.info("PlotSuggestionAgent inicializado com sucesso")
     
     def generate_suggestions(self, description: str) -> List[Dict[str, Any]]:
         """
-        Gera sugestões de ambientes com base na descrição fornecida.
+        Gera sugestões de enredo com base na descrição fornecida.
         
         Args:
-            description (str): Descrição do ambiente desejado
+            description (str): Descrição do enredo desejado
             
         Returns:
-            List[Dict[str, Any]]: Lista de sugestões de ambientes
+            List[Dict[str, Any]]: Lista de sugestões de enredo
         """
         logger.info(f"Gerando sugestões para descrição: {description[:100]}...")
         
