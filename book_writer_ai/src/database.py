@@ -7,7 +7,7 @@ from src.utils.logger import logger
 
 # Configuração do banco de dados
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'books.db')}"
+DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'src', 'database.db')}"
 
 logger.info(f"Diretório base: {BASE_DIR}")
 logger.info(f"URL do banco de dados: {DATABASE_URL}")
@@ -32,7 +32,7 @@ def init_db():
         from src.models.book import Book
         
         # Verificar se o banco já existe
-        db_exists = os.path.exists(os.path.join(BASE_DIR, 'books.db'))
+        db_exists = os.path.exists(os.path.join(BASE_DIR, 'src', 'database.db'))
         logger.info(f"Banco de dados {'existe' if db_exists else 'não existe'}")
         
         if db_exists:

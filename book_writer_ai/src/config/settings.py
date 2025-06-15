@@ -28,6 +28,8 @@ Retorne APENAS um objeto JSON válido contendo uma lista de sugestões de livros
 - genero: gênero literário
 - idioma: idioma do livro
 - sinopse: breve descrição do enredo
+- estilo_narrativo: estilo de narração (ex: primeira pessoa, terceira pessoa, epistolar, etc.)
+- publico_alvo: público alvo do livro (ex: infantil, juvenil, adulto, etc.)
 
 Exemplo de formato:
 [
@@ -37,7 +39,9 @@ Exemplo de formato:
         "autor": "Nome do Autor",
         "genero": "Ficção Científica",
         "idioma": "Português",
-        "sinopse": "Uma breve descrição do enredo..."
+        "sinopse": "Uma breve descrição do enredo...",
+        "estilo_narrativo": "Terceira pessoa",
+        "publico_alvo": "Juvenil"
     }}
 ]
 

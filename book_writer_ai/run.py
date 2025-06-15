@@ -52,6 +52,8 @@ def main():
                     st.write(f"**Autor:** {book['autor']}")
                     st.write(f"**Gênero:** {book['genero']}")
                     st.write(f"**Idioma:** {book['idioma']}")
+                    st.write(f"**Estilo Narrativo:** {book['estilo_narrativo']}")
+                    st.write(f"**Público Alvo:** {book['publico_alvo']}")
                     st.write(f"**Sinopse:** {book['sinopse']}")
                     
                     col1, col2 = st.columns(2)
@@ -146,6 +148,8 @@ def main():
             with col2:
                 genero = st.text_input("Gênero", value=book['genero'])
                 idioma = st.text_input("Idioma", value=book['idioma'])
+                estilo_narrativo = st.text_input("Estilo Narrativo", value=book['estilo_narrativo'])
+                publico_alvo = st.text_input("Público Alvo", value=book['publico_alvo'])
             
             sinopse = st.text_area("Sinopse", value=book['sinopse'], height=150)
             
@@ -165,7 +169,9 @@ def main():
                         "autor": autor,
                         "genero": genero,
                         "idioma": idioma,
-                        "sinopse": sinopse
+                        "sinopse": sinopse,
+                        "estilo_narrativo": estilo_narrativo,
+                        "publico_alvo": publico_alvo
                     }
                     book_service.update_book(book['id'], book_data)
                     st.success("Livro atualizado com sucesso!")
@@ -305,6 +311,8 @@ def main():
                 with col2:
                     genero = st.text_input("Gênero", value=st.session_state.get('suggested_book', {}).get('genero', ''))
                     idioma = st.text_input("Idioma", value=st.session_state.get('suggested_book', {}).get('idioma', ''))
+                    estilo_narrativo = st.text_input("Estilo Narrativo", value=st.session_state.get('suggested_book', {}).get('estilo_narrativo', ''))
+                    publico_alvo = st.text_input("Público Alvo", value=st.session_state.get('suggested_book', {}).get('publico_alvo', ''))
                 
                 sinopse = st.text_area("Sinopse", value=st.session_state.get('suggested_book', {}).get('sinopse', ''), height=150)
                 
@@ -318,7 +326,9 @@ def main():
                             "autor": autor,
                             "genero": genero,
                             "idioma": idioma,
-                            "sinopse": sinopse
+                            "sinopse": sinopse,
+                            "estilo_narrativo": estilo_narrativo,
+                            "publico_alvo": publico_alvo
                         }
                         book_service.create_book(book_data)
                         st.success("Livro adicionado com sucesso!")
