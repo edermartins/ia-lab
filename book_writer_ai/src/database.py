@@ -32,6 +32,7 @@ def init_db():
         from src.models.book import Book
         from src.models.character import Character
         from src.models.environment import Environment
+        from src.models.chapter import Chapter
         
         # Verificar se o banco já existe
         db_exists = os.path.exists(os.path.join(BASE_DIR, 'src', 'database.db'))

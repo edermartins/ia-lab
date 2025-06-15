@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy.orm import relationship
 from src.database import Base
 from src.utils.logger import logger
 
@@ -16,6 +17,9 @@ class Book(Base):
     sinopse = Column(Text, nullable=True)
     estilo_narrativo = Column(String(50), nullable=True)
     publico_alvo = Column(String(50), nullable=True)
+    
+    # Relacionamento com Chapter
+    chapters = relationship("Chapter", back_populates="book", cascade="all, delete-orphan")
     
     def __init__(self, **kwargs):
         logger.debug(f"Inicializando Book com dados: {kwargs}")

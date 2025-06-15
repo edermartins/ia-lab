@@ -7,6 +7,9 @@ from src.services.environment_service import EnvironmentService
 from src.config.settings import APP_NAME, APP_ICON
 from src.utils.logger import logger
 from src.database import init_db
+from src.interface.book_interface import BookInterface
+from src.interface.character_interface import CharacterInterface
+from src.interface.environment_interface import EnvironmentInterface
 
 # Adiciona o diretório src ao PYTHONPATH
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
@@ -22,14 +25,14 @@ def main():
     )
     
     # Inicializar o estado da sessão
-    if 'suggested_book' not in st.session_state:
-        st.session_state['suggested_book'] = {}
+    if 'current_view' not in st.session_state:
+        st.session_state['current_view'] = 'list_books'
+    if 'selected_book' not in st.session_state:
+        st.session_state['selected_book'] = None
     if 'suggested_character' not in st.session_state:
         st.session_state['suggested_character'] = {}
     if 'suggested_environment' not in st.session_state:
         st.session_state['suggested_environment'] = {}
-    if 'editing_book' not in st.session_state:
-        st.session_state['editing_book'] = None
     if 'editing_character' not in st.session_state:
         st.session_state['editing_character'] = None
     if 'editing_environment' not in st.session_state:
@@ -41,146 +44,22 @@ def main():
     book_service = BookService()
     character_service = CharacterService()
     environment_service = EnvironmentService()
+    book_interface = BookInterface()
+    character_interface = CharacterInterface()
+    environment_interface = EnvironmentInterface()
     
     # Sidebar para lista de livros, personagens e ambientes
     with st.sidebar:
         st.header("Meus Livros")
-        books = book_service.get_all_books()
-        if books:
-            for book in books:
-                with st.expander(f"📚 {book['titulo']} - Volume {book['volume']}"):
-                    st.write(f"**Autor:** {book['autor']}")
-                    st.write(f"**Gênero:** {book['genero']}")
-                    st.write(f"**Idioma:** {book['idioma']}")
-                    st.write(f"**Estilo Narrativo:** {book['estilo_narrativo']}")
-                    st.write(f"**Público Alvo:** {book['publico_alvo']}")
-                    st.write(f"**Sinopse:** {book['sinopse']}")
-                    
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        if st.button("Editar", key=f"edit_book_{book['id']}"):
-                            st.session_state['editing_book'] = book
-                            st.rerun()
-                    
-                    with col2:
-                        if st.button("Excluir", key=f"delete_book_{book['id']}"):
-                            try:
-                                book_service.delete_book(book['id'])
-                                st.success("Livro excluído com sucesso!")
-                                st.rerun()
-                            except Exception as e:
-                                logger.error(f"Erro ao excluir livro: {str(e)}", exc_info=True)
-                                st.error("Erro ao excluir livro. Tente novamente.")
-        else:
-            st.info("Nenhum livro cadastrado.")
-        
+        book_interface.show_books_list(sidebar=True)
         st.header("Meus Personagens")
-        characters = character_service.get_all_characters()
-        if characters:
-            for character in characters:
-                with st.expander(f"👤 {character['nome']}"):
-                    st.write(f"**Idade:** {character['idade']}")
-                    st.write(f"**Papel:** {character['papel']}")
-                    st.write(f"**Características Físicas:** {character['caracteristicas_fisicas']}")
-                    st.write(f"**Personalidade:** {character['personalidade']}")
-                    st.write(f"**Histórico:** {character['historico']}")
-                    
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        if st.button("Editar", key=f"edit_char_{character['id']}"):
-                            st.session_state['editing_character'] = character
-                            st.rerun()
-                    
-                    with col2:
-                        if st.button("Excluir", key=f"delete_char_{character['id']}"):
-                            try:
-                                character_service.delete_character(character['id'])
-                                st.success("Personagem excluído com sucesso!")
-                                st.rerun()
-                            except Exception as e:
-                                logger.error(f"Erro ao excluir personagem: {str(e)}", exc_info=True)
-                                st.error("Erro ao excluir personagem. Tente novamente.")
-        else:
-            st.info("Nenhum personagem cadastrado.")
-        
+        character_interface.show_characters_list()
         st.header("Meus Ambientes")
-        environments = environment_service.get_all_environments()
-        if environments:
-            for environment in environments:
-                with st.expander(f"🌍 {environment['nome']}"):
-                    st.write(f"**Tipo:** {environment['tipo']}")
-                    st.write(f"**Descrição:** {environment['descricao']}")
-                    st.write(f"**Atmosfera:** {environment['atmosfera']}")
-                    st.write(f"**Elementos Importantes:** {environment['elementos_importantes']}")
-                    st.write(f"**Significado:** {environment['significado']}")
-                    
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        if st.button("Editar", key=f"edit_env_{environment['id']}"):
-                            st.session_state['editing_environment'] = environment
-                            st.rerun()
-                    
-                    with col2:
-                        if st.button("Excluir", key=f"delete_env_{environment['id']}"):
-                            try:
-                                environment_service.delete_environment(environment['id'])
-                                st.success("Ambiente excluído com sucesso!")
-                                st.rerun()
-                            except Exception as e:
-                                logger.error(f"Erro ao excluir ambiente: {str(e)}", exc_info=True)
-                                st.error("Erro ao excluir ambiente. Tente novamente.")
-        else:
-            st.info("Nenhum ambiente cadastrado.")
+        environment_interface.show_environments_list()
     
     # Área principal
-    if st.session_state['editing_book'] is not None:
-        book = st.session_state['editing_book']
-        st.header("Editar Livro")
-        
-        with st.form("editar_livro_form"):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                titulo = st.text_input("Título", value=book['titulo'])
-                volume = st.text_input("Volume", value=book['volume'])
-                autor = st.text_input("Autor", value=book['autor'])
-            
-            with col2:
-                genero = st.text_input("Gênero", value=book['genero'])
-                idioma = st.text_input("Idioma", value=book['idioma'])
-                estilo_narrativo = st.text_input("Estilo Narrativo", value=book['estilo_narrativo'])
-                publico_alvo = st.text_input("Público Alvo", value=book['publico_alvo'])
-            
-            sinopse = st.text_area("Sinopse", value=book['sinopse'], height=150)
-            
-            col1, col2 = st.columns([1, 4])
-            with col1:
-                submitted = st.form_submit_button("Salvar Alterações")
-            with col2:
-                if st.form_submit_button("Cancelar"):
-                    st.session_state['editing_book'] = None
-                    st.rerun()
-            
-            if submitted:
-                try:
-                    book_data = {
-                        "titulo": titulo,
-                        "volume": volume,
-                        "autor": autor,
-                        "genero": genero,
-                        "idioma": idioma,
-                        "sinopse": sinopse,
-                        "estilo_narrativo": estilo_narrativo,
-                        "publico_alvo": publico_alvo
-                    }
-                    book_service.update_book(book['id'], book_data)
-                    st.success("Livro atualizado com sucesso!")
-                    st.session_state['editing_book'] = None
-                    st.rerun()
-                except Exception as e:
-                    logger.error(f"Erro ao atualizar livro: {str(e)}", exc_info=True)
-                    st.error("Erro ao atualizar livro. Tente novamente.")
-    
+    if st.session_state.get('current_view') == 'edit_book' and st.session_state.get('selected_book'):
+        book_interface.show_edit_book(st.session_state['selected_book'])
     elif st.session_state['editing_character'] is not None:
         character = st.session_state['editing_character']
         st.header("Editar Personagem")
@@ -287,7 +166,7 @@ def main():
                             suggestions = book_service.generate_suggestions(description)
                             if suggestions:
                                 # Armazenar a primeira sugestão no session_state
-                                st.session_state['suggested_book'] = suggestions[0]
+                                st.session_state['selected_book'] = suggestions[0]
                                 st.success("Sugestão gerada com sucesso! Os campos foram preenchidos automaticamente.")
                             else:
                                 st.warning("Não foi possível gerar sugestões. Tente novamente.")
@@ -304,17 +183,17 @@ def main():
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    titulo = st.text_input("Título", value=st.session_state.get('suggested_book', {}).get('titulo', ''))
-                    volume = st.text_input("Volume", value=st.session_state.get('suggested_book', {}).get('volume', ''))
-                    autor = st.text_input("Autor", value=st.session_state.get('suggested_book', {}).get('autor', ''))
+                    titulo = st.text_input("Título", value=(st.session_state.get('selected_book') or {}).get('titulo', ''))
+                    volume = st.text_input("Volume", value=(st.session_state.get('selected_book') or {}).get('volume', ''))
+                    autor = st.text_input("Autor", value=(st.session_state.get('selected_book') or {}).get('autor', ''))
                 
                 with col2:
-                    genero = st.text_input("Gênero", value=st.session_state.get('suggested_book', {}).get('genero', ''))
-                    idioma = st.text_input("Idioma", value=st.session_state.get('suggested_book', {}).get('idioma', ''))
-                    estilo_narrativo = st.text_input("Estilo Narrativo", value=st.session_state.get('suggested_book', {}).get('estilo_narrativo', ''))
-                    publico_alvo = st.text_input("Público Alvo", value=st.session_state.get('suggested_book', {}).get('publico_alvo', ''))
+                    genero = st.text_input("Gênero", value=(st.session_state.get('selected_book') or {}).get('genero', ''))
+                    idioma = st.text_input("Idioma", value=(st.session_state.get('selected_book') or {}).get('idioma', ''))
+                    estilo_narrativo = st.text_input("Estilo Narrativo", value=(st.session_state.get('selected_book') or {}).get('estilo_narrativo', ''))
+                    publico_alvo = st.text_input("Público Alvo", value=(st.session_state.get('selected_book') or {}).get('publico_alvo', ''))
                 
-                sinopse = st.text_area("Sinopse", value=st.session_state.get('suggested_book', {}).get('sinopse', ''), height=150)
+                sinopse = st.text_area("Sinopse", value=(st.session_state.get('selected_book') or {}).get('sinopse', ''), height=150)
                 
                 submitted = st.form_submit_button("Adicionar Livro")
                 
@@ -333,7 +212,7 @@ def main():
                         book_service.create_book(book_data)
                         st.success("Livro adicionado com sucesso!")
                         # Limpar a sugestão após adicionar o livro
-                        st.session_state['suggested_book'] = {}
+                        st.session_state['selected_book'] = None
                         st.rerun()
                     except Exception as e:
                         logger.error(f"Erro ao adicionar livro: {str(e)}", exc_info=True)
