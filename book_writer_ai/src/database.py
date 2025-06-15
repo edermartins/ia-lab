@@ -28,8 +28,10 @@ def init_db():
     """Inicializa o banco de dados criando todas as tabelas."""
     try:
         logger.info("Inicializando banco de dados...")
-        # Importar os modelos aqui para garantir que todas as tabelas sejam criadas
+        # Importar modelos
         from src.models.book import Book
+        from src.models.character import Character
+        from src.models.environment import Environment
         
         # Verificar se o banco já existe
         db_exists = os.path.exists(os.path.join(BASE_DIR, 'src', 'database.db'))

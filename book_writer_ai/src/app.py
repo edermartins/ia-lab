@@ -1,33 +1,35 @@
 import streamlit as st
-from config.settings import APP_NAME, APP_ICON
-from ui.pages import create_book, list_books, edit_book, delete_book
-from services.database import init_db
+from src.interface.main_interface import MainInterface
+from src.utils.logger import logger
+
+def init_services():
+    """Inicializa os serviços necessários."""
+    logger.info("Inicializando serviços")
+ 
+def init_interface(chapter_service):
+    """Inicializa a interface principal."""
+    logger.info("Inicializando interface principal")
+    try:
+        interface = MainInterface(chapter_service)
+        logger.info("Interface principal inicializada com sucesso")
+        return interface
+    except Exception as e:
+        logger.error(f"Erro ao inicializar interface principal: {str(e)}", exc_info=True)
+        raise
 
 def main():
-    # Configuração da página
-    st.set_page_config(page_title=APP_NAME, page_icon=APP_ICON)
-    
-    # Inicializar banco de dados
-    init_db()
-    
-    # Título principal
-    st.title(f"{APP_ICON} {APP_NAME}")
-    
-    # Sidebar para navegação
-    page = st.sidebar.selectbox(
-        "Navegação",
-        ["Criar Livro", "Listar Livros", "Editar Livro", "Excluir Livro"]
-    )
-    
-    # Renderizar página selecionada
-    if page == "Criar Livro":
-        create_book.render()
-    elif page == "Listar Livros":
-        list_books.render()
-    elif page == "Editar Livro":
-        edit_book.render()
-    elif page == "Excluir Livro":
-        delete_book.render()
+    """Função principal da aplicação."""
+    try:
+        # Configurar a página
+        st.set_page_config(
+            page_title="Book Writer AI",
+            page_icon="📚",
+            layout="wide"
+        )
+        
+    except Exception as e:
+        logger.error(f"Erro na aplicação: {str(e)}", exc_info=True)
+        st.error(f"Erro na aplicação: {str(e)}")
 
 if __name__ == "__main__":
     main() 

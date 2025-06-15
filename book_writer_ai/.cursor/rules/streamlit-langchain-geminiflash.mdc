@@ -1,9 +1,0 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-Todo o código gerado deve ser em inglês, incluindo os comentários
-Estou utilizando Python 3.11 e o ambiente Conda "book_writer" sempre que for executar alguma ação utilize este ambiente
-Este projeto deve utilizar Streamlit, gemini-2.0-flash e a biblioteca LangChain para criar os agentes
-Caso solicite persistência, devera utilizar o SQLite

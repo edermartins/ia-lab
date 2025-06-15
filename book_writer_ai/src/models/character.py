@@ -1,7 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, String, Text, Integer
 from src.database import Base
 from src.utils.logger import logger
-import uuid
 
 class Character(Base):
     """Modelo para representar um personagem no banco de dados."""
@@ -18,8 +17,6 @@ class Character(Base):
     
     def __init__(self, **kwargs):
         logger.debug(f"Inicializando Character com dados: {kwargs}")
-        if 'id' not in kwargs:
-            kwargs['id'] = str(uuid.uuid4())
         super().__init__(**kwargs)
     
     def to_dict(self):
