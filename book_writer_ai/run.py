@@ -10,6 +10,7 @@ from src.database import init_db
 from src.interface.book_interface import BookInterface
 from src.interface.character_interface import CharacterInterface
 from src.interface.environment_interface import EnvironmentInterface
+from src.interface.main_interface import MainInterface
 
 # Adiciona o diretório src ao PYTHONPATH
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
@@ -47,6 +48,7 @@ def main():
     book_interface = BookInterface()
     character_interface = CharacterInterface()
     environment_interface = EnvironmentInterface()
+    main_interface = MainInterface()
     
     # Sidebar para lista de livros, personagens e ambientes
     with st.sidebar:
@@ -60,6 +62,12 @@ def main():
     # Área principal
     if st.session_state.get('current_view') == 'edit_book' and st.session_state.get('selected_book'):
         book_interface.show_edit_book(st.session_state['selected_book'])
+    elif st.session_state.get('current_view') == 'edit_chapter' and st.session_state.get('selected_chapter'):
+        main_interface.chapter_interface.show_edit_chapter(st.session_state['selected_chapter'])
+    elif st.session_state.get('current_view') == 'manage_chapters' and st.session_state.get('selected_book'):
+        main_interface.show_manage_chapters(st.session_state['selected_book'])
+    elif st.session_state.get('current_view') == 'create_chapter' and st.session_state.get('selected_book'):
+        main_interface.chapter_interface.show_create_chapter(st.session_state['selected_book']['id'])
     elif st.session_state['editing_character'] is not None:
         character = st.session_state['editing_character']
         st.header("Editar Personagem")

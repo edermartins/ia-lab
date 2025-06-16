@@ -44,8 +44,8 @@ class CharacterSuggestionAgent:
         
         # Configurar o template do prompt
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", """Você é um assistente especializado em criar sugestões de personagens. 
-            Com base na descrição fornecida, crie uma sugestão detalhada de personagem.
+            ("system", """Você é um escritor e roteirista especializado na criação de personagens. 
+            Com base na descrição fornecida, crie uma sugestão detalhada de personagem com um bom nível de detalhes e criatividade.
             
             {format_instructions}
             

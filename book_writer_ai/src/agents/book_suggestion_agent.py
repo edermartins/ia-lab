@@ -45,8 +45,8 @@ class BookSuggestionAgent:
         
         # Configurar o template do prompt
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", """Você é um assistente especializado em criar sugestões de livros. 
-            Com base na descrição fornecida, crie uma sugestão detalhada de livro.
+            ("system", """Você é um escritor e roteirista com muita experiência em criar livros com temas variádos. 
+            Com base na descrição fornecida, crie uma sugestão detalhada de livro com um bom nível de detalhes e criatividade.
             
             {format_instructions}
             

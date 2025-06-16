@@ -15,9 +15,11 @@ class ChapterService:
         logger.info(f"Criando novo capítulo: {chapter_data}")
         try:
             with get_db() as db:
+                # Remover campos não suportados pelo modelo
+                chapter_data_clean = {k: v for k, v in chapter_data.items() if k in ['book_id', 'titulo', 'ordem', 'descricao_autor', 'texto']}
                 chapter = Chapter(
                     id=str(uuid.uuid4()),
-                    **chapter_data
+                    **chapter_data_clean
                 )
                 db.add(chapter)
                 db.commit()

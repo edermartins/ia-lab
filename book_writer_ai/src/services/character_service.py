@@ -4,6 +4,7 @@ from src.models.character import Character
 from src.agents.character_suggestion_agent import CharacterSuggestionAgent
 from src.database import get_db
 from src.utils.logger import logger
+import uuid
 
 class CharacterService:
     def __init__(self):
@@ -25,6 +26,7 @@ class CharacterService:
             with get_db() as db:
                 logger.debug("Criando nova instância de Character")
                 new_character = Character(
+                    id=str(uuid.uuid4()),
                     nome=character_data['nome'],
                     idade=character_data['idade'],
                     papel=character_data['papel'],
