@@ -28,7 +28,19 @@ class ChapterSuggestionAgent:
         )
         self.parser = PydanticOutputParser(pydantic_object=ChapterSuggestion)
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", '''Você é um escritor com longa experiência em criar livros com temas variádos.\nCom base na sugestão do autor, dos personagens e ambientes selecionados, gere um capítulo completo com tamanho entre 1000 e 5000 palavras.\n\n{format_instructions}\n\nRegras importantes:\n1. Use aspas duplas para strings\n2. Não use vírgula após o último item\n3. Não inclua texto adicional ou formatação markdown\n4. Não use blocos de código\n5. Retorne apenas o JSON válido'''),
+            ("system", """Você é um escritor com longa experiência em criar livros com temas variádos.
+                        Com base na sugestão do autor, dos personagens e ambientes selecionados, gere 
+                        um capítulo completo com tamanho entre 1000 e 5000 palavras.
+             
+                        {format_instructions}
+             
+                        Regras importantes:
+                        1. Use aspas duplas para strings
+                        2. Não use vírgula após o último item
+                        3. Não inclua texto adicional ou formatação markdown
+                        4. Não use blocos de código
+                        5. Retorne apenas o JSON válido
+                        6. Use um hifen no início, quando for um personagem falando"""),
             ("human", "Sugestão: {sugestao}\nPersonagens: {personagens}\nAmbientes: {ambientes}")
         ])
         logger.info("ChapterSuggestionAgent inicializado com sucesso")

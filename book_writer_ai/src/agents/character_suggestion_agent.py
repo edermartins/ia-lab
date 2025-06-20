@@ -44,8 +44,10 @@ class CharacterSuggestionAgent:
         
         # Configurar o template do prompt
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", """Você é um escritor e roteirista especializado na criação de personagens. 
-            Com base na descrição fornecida, crie uma sugestão detalhada de personagem com um bom nível de detalhes e criatividade.
+            ("system", """Você é um escritor e roteirista especializado na criação de detalhes de personagens. 
+             Com base na descrição fornecida, crie uma sugestão detalhada de personagem com bastante criatividade,
+             seguindo as sugestões antes das Regras importantes. Se não houver sugestões, crie um personagem com 
+             criatividade.
             
             {format_instructions}
             
@@ -79,16 +81,16 @@ class CharacterSuggestionAgent:
                 format_instructions=self.parser.get_format_instructions()
             )
             
-            # Gerar a resposta
+            # Salva a resposta
             response = self.model.invoke(prompt)
             
-            # Log da resposta bruta
+            # Log da resposta bruta (deu muito erro antes de dar certo)
             logger.info(f"Resposta bruta recebida: {response.content[:200]}...")
             
-            # Parsear a resposta
+            # Parser da resposta
             result = self.parser.parse(response.content)
             
-            # Converter para lista de dicionários
+            # Converte para dict
             suggestions = [suggestion.dict() for suggestion in result.suggestions]
             
             logger.info(f"Retornando {len(suggestions)} sugestões válidas")

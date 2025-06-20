@@ -44,8 +44,9 @@ class PlotSuggestionAgent:
         
         # Configurar o template do prompt
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", """Você é um escritor e roteirista especializado em criar enredos complexos. 
-            Com base na descrição fornecida, crie uma sugestão detalhada de enredo com um bom nível de detalhes e criatividade.
+            ("system", """Você é um escritor e roteirista especializado em criar enredos complexos e empolgantes. 
+             Com base na descrição fornecida abaixo, crie uma sugestão detalhada de enredo. Caso não haja sugestões, entre
+             esta linha e Regras importantes, crie um enredo com bastante criatividade.
             
             {format_instructions}
             
@@ -73,22 +74,22 @@ class PlotSuggestionAgent:
         logger.info(f"Gerando sugestões para descrição: {description[:100]}...")
         
         try:
-            # Preparar o prompt com as instruções de formato
+            # Prepara o prompt com as instruções de formatação
             prompt = self.prompt.format_messages(
                 description=description,
                 format_instructions=self.parser.get_format_instructions()
             )
             
-            # Gerar a resposta
+            # Gera a resposta
             response = self.model.invoke(prompt)
             
-            # Log da resposta bruta
+            # Log da resposta bruta (deu muito erro antes de dar certo)
             logger.info(f"Resposta bruta recebida: {response.content[:200]}...")
             
-            # Parsear a resposta
+            # Parser da resposta
             result = self.parser.parse(response.content)
             
-            # Converter para lista de dicionários
+            # Converte para dict
             suggestions = [suggestion.dict() for suggestion in result.suggestions]
             
             logger.info(f"Retornando {len(suggestions)} sugestões válidas")
